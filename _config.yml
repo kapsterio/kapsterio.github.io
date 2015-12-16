@@ -11,7 +11,7 @@ email: zhangheng21@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
     Hi~ I am a software engineer from Meituan. Now, the most commonly used programming language in my work is PHP and Java, and I'm  also familiar with C and Python. By the way, I'm pretty fascinated with UNIX system, and I love to write small utils and scripts on that. 
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://kapsterio.com" # the base hostname & protocol for your site
+url: "http://kapsterio.github.io" # the base hostname & protocol for your site
 twitter_username: null
 github_username:  kapsterio
 
