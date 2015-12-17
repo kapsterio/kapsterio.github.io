@@ -18,14 +18,46 @@ github_username:  kapsterio
 # Build settings
 markdown: kramdown
 
+#you can override those settings in a post or page file. 
+#All you need to do is specify the settings in the post or page front matter. 
+#scope是路径，用来匹配生效的文件
+#values是变量和其值
+#变量是什么，变量是jekyll解析每个文本文件时用到的，一般定义在每个文本文件的front matter块中
+#当然有很多变量对所有的文本文件都是通用的，比如author,layout等，在每个文件中定义显然很费事
+#因此，jekyll支持在_config.yml中写个defaults配置，做到匹配一类文件，为其定义一些变量
+#有哪些变量可以定义呢？分为两类，一种是jekyll预定义的变量，另一种是自定义变量
+
+#对于预定义变量，用户只管赋值就行，系统根据值来决定生成的结果，比如layout,如果为某个内容文件指定了layout
+#那么，解析这个文件时就会去找去_layout目录找到{layoutname}.html，把{{content}}替换为内容文件的内容
+#layout文件也可以指定layout,也就是说layout还可以嵌套，解析layout文件时也会去找其指定的layout
+
+#对于自定义变量，在front matter中定义后，如果要使用，则需要用{{page.XXX}}来引用
+
+####layout
+#If set, this specifies the layout file to use. Use the layout file name without the file extension. Layout files must be placed in the  _layouts directory.
+####permalink
+#If you need your processed blog post URLs to be something other than the site-wide style (default /year/month/day/title.html), then you can set this variable and it will be used as the final URL.
+####published
+#Set to false if you don’t want a specific post to show up when the site is generated.
+####category
+####categories
+#Instead of placing posts inside of folders, you can specify one or more categories that the post belongs to. When the site is generated the post will act as though it had been set with these categories normally. Categories (plural key) can be specified as a YAML list or a comma-separated string.
+####tags
+#Similar to categories, one or multiple tags can be added to a post. Also like categories, tags can be specified as a YAML list or a comma-separated string.
+#####date 对于每个post而言，date也是预定变量，作用是保证能够正确的排序 有如下的格式
+#YYYY-MM-DD HH:MM:SS +/-TTTT
+
+#除了上述的jekyll预定义的变量，可以自定义变量，比如可以在某个md的front matter中定义title、author..
 defaults:
   -
     scope:
-      path: ""
-      type: "posts"
+      path: "" #the path is set as an empty string, it will apply to all files in your project
+      type: "posts" #The different types that are available to you are pages, posts, drafts or any collection in your site.
     values:
-      layout: "post"
-      author: "johnny kapster"
+      layout: "post" #预定义的变量
+      author: "johnny kapster" #自定义的变量
+      #published: false ###
+      category: "test"
   -
     scope:
       path: "projects"
