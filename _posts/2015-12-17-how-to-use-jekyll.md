@@ -1,6 +1,5 @@
 ---
-layout: post
-title:  "Welcome to Jekyll!"
+title:  "how to use?"
 date:   2015-12-16 23:40:07 +0800
 categories: jekyll update
 ---
