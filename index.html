@@ -16,7 +16,7 @@ layout: default
         </h2>
       </li>
       <li>
-          {{post.excerpt}}
+          {{post.content || split:'<!--more-->' | first}}
       </li>
     {% endfor %}
   </ul>
