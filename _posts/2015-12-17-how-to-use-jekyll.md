@@ -1,7 +1,8 @@
 ---
 title:  "how to use?"
 date:   2015-12-16 23:40:07 +0800
-categories: jekyll update
+#categories: test,intro
+#当配置了permalink后，categories好像不起作用了 
 permalink: howtouse.html
 ---
 hi~ all
