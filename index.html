@@ -16,7 +16,8 @@ layout: default
         </h2>
       </li>
       <li>
-          {{post.content || split:'<!--more-->' | first}}
+          {{post.content | split:'<!--more-->' | first}}
+          <h7><a href='{{post.url}}'>read more</h7>
       </li>
     {% endfor %}
   </ul>
