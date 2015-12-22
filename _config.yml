@@ -9,6 +9,7 @@ exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 # so be sure to set them if your theme uses them.
 #
 paginate : 3
+paginate_path: "page:num"
 title : kaspterio
 tagline: Site Tagline
 desc: power by <a href="">jekyll</a>/<a href="">bootstrap</a>/<a href="">duoshuo</a>/<a href="">github</a>
