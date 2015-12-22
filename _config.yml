@@ -78,7 +78,7 @@ JB :
   # Set 'provider' to false to turn commenting off globally.
   #
   comments :
-    provider : disqus
+    provider : duoshuo
     disqus :
       short_name : jekyllbootstrap
     livefyre :
@@ -91,7 +91,7 @@ JB :
       width: 580
       colorscheme: light
     duoshuo :
-      short_name : jekyllbootstrap
+      short_name : kapsterio
    
   # Settings for analytics helper
   # Set 'provider' to the analytics provider you want to use.
@@ -117,7 +117,7 @@ JB :
   # Set 'provider' to false to turn sharing off globally.
   #
   sharing :
-    provider : false
+    provider : duoshuo
     
   # Settings for all other include helpers can be defined by creating 
   # a hash with key named for the given helper. ex:

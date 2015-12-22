@@ -3,9 +3,9 @@ layout: post
 category : lessons
 tagline: "Supporting tagline"
 tags : [intro, beginner, jekyll, tutorial]
+theme :
+  name : bootstrap-3
 ---
-{% include JB/setup %}
-
 # TMUX的一点总结
 
 ## 工作原理
