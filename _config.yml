@@ -10,6 +10,7 @@ exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 #
 title : kaspterio
 tagline: Site Tagline
+desc: power by <a href="">jekyll</a>/<a href="">bootstrap</a>/<a href="">duoshuo</a>/<a href="">github</a>
 author :
   name : 章恒
   email : zhangheng21@gmail.com
