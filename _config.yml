@@ -11,8 +11,11 @@ exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 gems: [jekyll-paginate]
 paginate : 3
 title : kaspterio
-tagline: Site Tagline
-desc: power by <a href="">jekyll</a>/<a href="">duoshuo</a>/<a href="">github</a>
+tagline : code as a hacker
+version : 1.0 
+desc : power by <a href="">jekyll</a>/<a href="">duoshuo</a>/<a href="">github</a>
+github :
+  repo : https://github.com/kapsterio/kapsterio.github.io.git 
 author :
   name : 章恒
   email : zhangheng21@gmail.com

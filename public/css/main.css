@@ -20,6 +20,11 @@ body {
   -o-font-feature-settings: "kern" 1;
   font-feature-settings: "kern" 1;
   font-kerning: normal; }
+  
+.mytbody {
+    background-color: #eee;
+    height: 100%;
+  }
 
 /**
  * Set `margin-bottom` to maintain vertical rhythm
@@ -66,10 +71,10 @@ h1, h2, h3, h4, h5, h6 {
  * Links
  */
 a {
-  color: #85d7db;
+  color: #66BAB7;
   text-decoration: none; }
   a:visited {
-    color: #85d7db; }
+    color: #66BAB7; }
   a:hover {
     color: #111;
     text-decoration: underline; }
@@ -317,15 +322,9 @@ pre {
 .nav-prev {
   display: block;
   float: left;
-  background-color: #fff;
-  border-style: solid;
+  background-color: #85d7db;
   border-color: #ccc;
-  border-left-width: 1;
-  border-right-width: 1;
-  border-top-width: 1;
-  border-bottom-width: 1;
-  padding-bottom: 6px;
-  padding-top: 6px;
+ 
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 3px;
@@ -334,15 +333,8 @@ pre {
 .nav-next {
   display: block;
   float: right;
-  background-color: #fff;
-  border-style: solid;
+  background-color: #85d7db;
   border-color: #ccc;
-  border-left-width: 1;
-  border-right-width: 1;
-  border-top-width: 1;
-  border-bottom-width: 1;
-  padding-bottom: 6px;
-  padding-top: 6px;
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 3px;
