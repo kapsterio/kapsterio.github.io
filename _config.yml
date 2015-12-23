@@ -1,6 +1,6 @@
 # This is the default format. 
 # For more see: http://jekyllrb.com/docs/permalinks/
-permalink: /:categories/:year/:month/:day/:title 
+# permalink: /:categories/:year/:month/:day/:title 
 
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 # highlighter: pygments
@@ -8,11 +8,11 @@ exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
 #
+gems: [jekyll-paginate]
 paginate : 3
-paginate_path: "page:num"
 title : kaspterio
 tagline: Site Tagline
-desc: power by <a href="">jekyll</a>/<a href="">bootstrap</a>/<a href="">duoshuo</a>/<a href="">github</a>
+desc: power by <a href="">jekyll</a>/<a href="">duoshuo</a>/<a href="">github</a>
 author :
   name : 章恒
   email : zhangheng21@gmail.com

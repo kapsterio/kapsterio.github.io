@@ -1,5 +1,6 @@
 ---
 layout: page
+paginate_path: "page:num"
 ---
 
 <ul class="post-list">
@@ -13,28 +14,38 @@ layout: page
       </li>
       <li class="article">
           {{post.content | split:'<!--more-->' | first}}
-          <h7><a href='{{post.url}}' class="more-link">read more...</h7>
+          <h7><a href='{{post.url}}' class="more-link">read more...</a></h7>
       </li>
     
     {% endfor %}
 </ul>
 
-<div class="pagination">
-  
-  {% if paginator.next_page %}
-   #################### {{ paginator.total_posts }} ###############
-    <a class="pagination-item older" href="{{ site.baseurl }}/page{{paginator.next_page}}">Older</a>
+{% if paginator.total_pages > 1 %}
+<div class="nav-div">
+  {% if paginator.page > 1 %}
+    <a class="nav-prev" href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&laquo; Prev</a>
   {% else %}
-       #################### {{ paginator.total_posts }} ###############
-    <span class="pagination-item older">Older</span>
+    <span class="nav-prev">&laquo; Prev</span>
   {% endif %}
-  {% if paginator.previous_page %}
-    {% if paginator.page == 2 %}
-      <a class="pagination-item newer" href="{{ site.baseurl }}/">Newer</a>
+
+  <span class="nav-link">
+  <!--
+  {% for page in (1..paginator.total_pages) %}
+    {% if page == paginator.page %}
+      <em>{{ page }}</em>
+    {% elsif page == 1 %}
+      <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">{{ page }}</a>
     {% else %}
-      <a class="pagination-item newer" href="{{ site.baseurl }}/page{{paginator.previous_page}}">Newer</a>
+      <a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}">{{ page }}</a>
     {% endif %}
+  {% endfor %}
+  -->
+  </span>
+  
+  {% if paginator.page < paginator.total_pages %}
+    <a class="nav-next" href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">Next &raquo;</a>
   {% else %}
-    <span class="pagination-item newer">Newer</span>
+    <span class="nav-next">Next &raquo;</span>
   {% endif %}
 </div>
+{% endif %}
