@@ -190,8 +190,6 @@ defaults:
       author: "johnny kapster" #自定义的变量
       #published: false ###
       category: "test"
-      theme :
-        name : bootstrap-3
   -
     scope:
       path: "projects"
