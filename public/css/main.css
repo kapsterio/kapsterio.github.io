@@ -100,7 +100,7 @@ code {
   font-size: 15px;
   border: 1px solid #e8e8e8;
   border-radius: 3px;
-  background-color: #A5DEE4; }
+  background-color: #eff }
 
 code {
   padding: 1px 5px; }
@@ -142,7 +142,7 @@ pre {
 .article {
   margin: 0 0 3em;
   padding: 2em;
-  background: #fff;
+  background-color: #fff;
 }
 /**
  * Clearfix
