@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "markdown with latex"
+title: "markdown with LaTeX"
 description: ""
 category: [prductivity]
 tags: [markdown, latex]
@@ -32,7 +32,7 @@ Mac下可以使用homebrew安装，不嫌费事的话也可以从源码安装。
 	pandoc example.md -f markdown -t html -o example.html -s 
 ```
 
-将example.md装换成example.html文件。也可以反过来将html装换为md文件
+将example.md转换成example.html文件。也可以反过来将html转换为md文件
 
 终端输入：
 
@@ -40,10 +40,10 @@ Mac下可以使用homebrew安装，不嫌费事的话也可以从源码安装。
 	pandoc example.md -f markdown -t tex -o example.tex -s 
 ```
 
-则可以将md文件装换为tex文件，反过来也是可以的。
+则可以将md文件转换为tex文件，反过来也是可以的。
 
 ### 生成pdf
-如果想装换为pdf呢，如果你装了latex（比如Mac平台的MacTeX，windows平台的MiKTeX)，那么就可以将从tex文件生成pdf，不过这样也挺费事的。好在pandoc提供了直接从md到pdf的功能：
+如果想转换为pdf呢，如果你装了latex（比如Mac平台的MacTeX，windows平台的MiKTeX)，那么就可以将从tex文件生成pdf，不过这样也挺费事的。好在pandoc提供了直接从md到pdf的功能：
 
 ```>
 	pandoc example.md -f markdown -t pdf -o example.pdf -s 
