@@ -61,7 +61,7 @@ bingo~ pdf文件生成了。
 
 [这是那个example.md](http://mplewis.com/files/pandoc-md-latex/example.md)
 
-[这是生成的example.pdf](http://127.0.0.1:4000/example.pdf)
+[这是生成的example.pdf](http://{{ site.production_url }}/example.pdf)
 
 ### 网页上支持公式
 现在我想在我这个git pages博客里支持矢量公式，然而git pages的博客是通过jekyll解析博客内容的markdown文件生成的，咋办？大家看过[Stackoverflow](http://stackoverflow.com/)上的公式吧。这就用到MathJax引擎了。在需要显示矢量公式的博客markdown文件上加上：
