@@ -5,7 +5,7 @@ description: ""
 category: [prductivity]
 tags: [markdown, latex]
 ---
-<script type="text/javascript" src="{{ site.baseurl }}/public/js/MathJax.js" async></script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default" async></script>
 
 ## markdown是个利器
 自从接触了markdown，就很少再用Microsoft word或者apple pages写文档了. markdown能让你更关注内容，至于格式排版什么的就交给markdown去操心吧（和Latex理念一样）。这很重要，因为在写文档时这让能你消除对鼠标的依赖，从而提高效率，毕竟拖着鼠标来回点很费事的好么~ 至于编辑器，用vim就足够了。
@@ -62,4 +62,33 @@ bingo~ pdf文件生成了。
 [这是生成的example.pdf](http://127.0.0.1:4000/example.pdf)
 
 ### 网页上支持公式
-现在我想在我这个git pages博客里支持公式，然而git pages的博客是通过jekyll解析博客内容的markdown文件生成的，咋办？大家看过[Stackoverflow](http://stackoverflow.com/)上的公式吧。这就用到MathJax引擎了，
+现在我想在我这个git pages博客里支持矢量公式，然而git pages的博客是通过jekyll解析博客内容的markdown文件生成的，咋办？大家看过[Stackoverflow](http://stackoverflow.com/)上的公式吧。这就用到MathJax引擎了。在需要显示矢量公式的博客markdown文件上加上：
+
+{% highlight javascript linenos %}
+ <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+{% endhighlight %}
+
+然后再使用TeX语法写公式， `$$equation$$`表示行间公式， `\\(equation\\)`表示行内公式。
+
+比如行间公式：
+
+{% highlight c linenos %}
+$$x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$
+{% endhighlight %}
+
+显示的结果是：
+
+$$x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$
+
+行内公式： 
+
+{% highlight c linenos %}
+\\(-b\pm\sqrt{b^2-4ac}\\)
+{% endhighlight %}
+
+显示的结果是： \\(-b\pm\sqrt{b^2-4ac}\\)
+
+<br/>
+
+**世界因为有这些工具变得更美好了些~**
+
