@@ -12,6 +12,8 @@ tags: [markdown, latex]
 
 我在平常工作中主要使用markdown来写邮件和博客，也就是说只涉及把markdown文件解析为html文件，有一打的markdown解析引擎可以干这个事。
 
+<!--more-->
+
 然而markdown也不是万能的，比如想在文档中插入漂亮的数学公式就比较费事。回想起研究生时用latex来写公式的体验还是蛮不错的，语法也比较简单，而且还能从wikipedia导入（偷）一些现成的。那么能不能在markdown里能像在latex里一样直接书写公式，而不用去操心公式的排版呢，搜索了下，已有轮子了: [pandoc](http://pandoc.org/)。 研究了下，发现这货简直就是瑞士军刀啊！ 不仅支持markdown<->html、markdown<->tex，最重要的还支持markdown->pdf！
 
 ## pandoc
