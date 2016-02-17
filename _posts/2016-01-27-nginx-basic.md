@@ -6,7 +6,7 @@ category:
 tags: []
 ---
 
-##Nginx Basic
+## Nginx Basic
 本文主要是对nginx的配置做了一些简要的介绍，来源是nginx的官方文档，结合自己的理解做了下精简和翻译，一来，为了加深对各个配置的理解，二来，为下一步读nginx的源码做准备
 
 ### location的概念 
