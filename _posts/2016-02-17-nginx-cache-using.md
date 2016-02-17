@@ -33,6 +33,7 @@ server {
 {% endhighlight %}
 
 下面分别解释下proxy_cache_path中各个参数的含义：
+
 - /path/to/cache 指定的是装载了的本地disk目录。
 - levels设置了一个在/path/to/cache中的2级目录结构用来存放缓存content文件。
 - keys_zone设置了一个shared-memory zone，用于存放cache keys和一些metadata data（比如：usage timers）,将keys存放在这个shared-memory区域中使得所有worker进程能够快速知道某个key是否存在，1MB能存放8K个keys。
