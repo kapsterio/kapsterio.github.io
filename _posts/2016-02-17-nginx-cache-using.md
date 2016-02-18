@@ -74,5 +74,60 @@ server {
 }
 {% endhighlight %}
 
-- proxy_cache_revalidate指示nginx使用conditional Get去
+- proxy_cache_revalidate指示nginx当需要去后端服务器刷新内容时使用conditional Get请求。比如后端服务器的指定了内容的过期时间，当客户端发请求时内容已经过期，那么nginx需要重新去向后端服务器请求内容，但是proxy_cache_revalidate为on时，nginx请求将包含If-Modified-Since头(值为内容的Last-Modified)，后端服务器只有当自该时间点后修改过才会去响应内容，否则304，这样节省带宽。
+- proxy_cache_valid，这个指令可以为不同的响应code指定不同的在nginx端的缓存时间，例子中，为200的响应指定了缓存时间为1s，意味着1s后数据就过期了(expired)，但注意不是1s后自动删除了啊。当客户端再次请求该过期内容时，nginx就得去后端服务器去取了。
+
+- proxy_cache_min_uses设置只有经过几次访问，内容才会被nginx缓存，默认为1。这个设置主要是针对那些缓存经常被打满了场景，它保证只会缓存那些经常被访问的内容
+- proxy_cache_use_stale前面提到了，指定使用旧数据的场景，多了个updating，它告诉nginx，当同一个过期的内容有多个请求访问时，第一个请求将去后端服务器访问最新的数据，其他后续请求先使用旧数据，第一个请求则等待响应结束。
+
+- proxy_cache_lock是用于当多个请求访问同时同一个未缓存的内容时（MISS），缓存被击穿，为了防止流量导致后端服务器过载，nginx仅允许第一个请求向后端服务器访问数据，其他的请求先等待直到nginx将第一个请求的响应缓存。
+
+### 缓存可以位于不同的hard drives上
+{% highlight c %}
+proxy_cache_path /path/to/hdd1 levels=1:2 keys_zone=my_cache_hdd1:10m max_size=10g 
+                 inactive=60m use_temp_path=off;
+proxy_cache_path /path/to/hdd2 levels=1:2 keys_zone=my_cache_hdd2:10m max_size=10g 
+                 inactive=60m use_temp_path=off;
+
+split_clients $request_uri $my_cache {
+              50%          “my_cache_hdd1”;
+              50%          “my_cache_hdd2”;
+}
+
+server {
+    ...
+    location / {
+        proxy_cache $my_cache;
+        proxy_pass http://my_upstream;
+    }
+}
+{% endhighlight %}
+
+上面的例子中指定了两个cache,(my_cache_hdd1 and my_cache_hdd2)位于不同的hard drive上，split_clients指令配置将请求映射到两个cache的方法。
+
+### 一些杂项
+
+**nginx如何决定内容缓存或者不缓存**: 
+
+默认情况下，即便是配置了proxy_cache，nginx也不是对所有响应都进行缓存，nginx遵从后端服务器的Cache-Control，对于Cache-Control为private, no-cache, no-store或者响应头中有set-cookie的都不会进行缓存。另外，默认情况下，nginx只会去缓存客户端的GET和HEAD请求。当然可以配置让nginx覆盖这些默认行为，比如proxy_ignore_headers Cache-Control; proxy_cache_methods GET HEAD POST; proxy_cache_bypass
+
+**nginx缓存使用什么key**:
+
+默认情况下，是$scheme$proxy_host$request_uri，比如对于配置：
+{% highlight c %}
+proxy_cache_path /path/to/cache levels=1:2 keys_zone=my_cache:10m max_size=10g inactive=60m
+                 use_temp_path=off;
+
+server {
+    ...
+    location / {
+        proxy_cache $my_cache;
+        proxy_pass http://my_upstream;
+    }
+}
+{% endhighlight %}
+
+请求 http://www.example.org/my_image.jpg 的key是md5("http://my_upstream:80/my_image.jpg")，注意$proxy_host是proxy_pass指定的。
+
+可以用proxy_cache_key指令覆盖默认的行为，比如：proxy_cache_key $proxy_host$request_uri$cookie_jessionid;
 
