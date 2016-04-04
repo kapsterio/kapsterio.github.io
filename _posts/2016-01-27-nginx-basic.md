@@ -108,7 +108,7 @@ http {
 
 负责均衡除了上述几种机制外，还可以结合加权机制。在upstream中的server后面加上weight。
 
-nginx还支持health check，主要通过两个指令，fail_timeout 和max_fails。fail_timeout指定再次探测服务是否可用的时间间隔，max_fails指定连续探测几次后认定后端服务不可用，默认为1，为0时表示禁用health check功能。那么什么才是一次后端服务不可用的认定呢？是由根据后端服务的类型而独立定义的（proxy_next_upstream, fastcgi_next_upstream, uwsgi_next_upstream, scgi_next_upstream, memcached_next_upstream)，它们指定了什么情景下请求将被转发到下一个后端机器上。比如proxy_next_upstream的使用如下：
+nginx还支持health check，主要通过两个指令，fail_timeout 和max_fails。fail_timeout指定一个时间区间，如果在这个区间内连续的不成功的尝试次数达到max_fails时认定服务不可用，max_fails指定连续探测几次后认定后端服务不可用，默认为1，为0时表示禁用health check功能。那么什么才是一次不成功的尝试呢？是由根据后端服务的类型而独立定义的（proxy_next_upstream, fastcgi_next_upstream, uwsgi_next_upstream, scgi_next_upstream, memcached_next_upstream)，它们指定了什么情景下请求将被转发到下一个后端机器上。比如proxy_next_upstream的使用如下：
 {% highlight c %}
 Syntax: proxy_next_upstream error | timeout | invalid_header | http_500 | http_502 | http_503 | http_504 | http_403 | http_404 | off ...;
 Default: proxy_next_upstream error timeout;
