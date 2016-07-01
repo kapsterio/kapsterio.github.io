@@ -11,6 +11,8 @@ tags: []
 ## attributeMap的使用
 ChannelHandlerContext和Channel都继承了AttributeMap，也就是说他们都可以充当attributeMap。一般来说，一个channel就是一个链路（底层对应一个socket），它有一个业务handlers组成的pipeline，通常我们希望每个handler都是stateless的，这样handler对象就可以shared by everyone，然而有时handler有需要保存state的需求，那么此时可以利用pipeline上handler对象关联的context对象（也就是说每条pipeline上有这与handler数量相对应的context对象，在handler的override方法里都有context参数）来保存attribute。Channel对象的attribute有什么用呢，通常我们会把Channel对象保存在一个应用程序全局的地方，channel里的attribute就为我们提供了一种优雅实现保存连接属性的方法（比如之前的http的keepalive就可以放在着）。更多内容参见官方文档中[state management](http://netty.io/4.0/api/io/netty/channel/ChannelHandler.html)，以及[channelHandlerContext](http://netty.io/4.0/api/io/netty/channel/ChannelHandlerContext.html)
 
+<!--more-->
+
 ## 关于基于netty写一个proxy的例子
 我之前的理解是有问题的，即一个handler即作为服务端也作为客户端时如何共用eventloop，之前不知道怎么理解成了：共用eventloop后，pipeline也相同了。当然，作为服务端和客户端时底层连接都不一样，不是同一个channel，pipeline自然也不一样。他们只是共享eventloop而已（即在同一个selector上注册，由同一个线程处理）。
 
