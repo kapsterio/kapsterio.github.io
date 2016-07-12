@@ -14,6 +14,8 @@ Thrift是一个由FB在09年开源的序列化/RPC框架，具有优秀的跨语
 - THsHaServer(half-Sync/Half-Async：半同步、半异步)
 - TThreadedSelectorServer
 
+<!--more-->
+
 前两种是阻塞I/O型的，后三者是基于Non-Blocking I/O。这篇[文章](https://github.com/m1ch1/mapkeeper/wiki/Thrift-Java-Servers-Compared)通俗易懂地介绍了这五种Thrift Server的功能和特性，并做了一些性能比较。
 
 本文主要关注的是生产环境中最常用的TThreadedSelectorServer（公司的MTThrift framework采用的就是这个）并结合源码详细介绍他的设计和实现，顺便学习下java NIO的一些最佳实践
