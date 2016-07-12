@@ -6,7 +6,9 @@ category:
 tags: []
 ---
 # 背景
-Thrift是一个由FB在09年开源的序列化/RPC框架，具有优秀的跨语言特性，现在已经成为apache基金会的子项目。这里先对Thrift本身做个简单介绍，其主要包括三个组件：protocol，transport和server，其中，protocol定义了消息是怎样序列化的，transport定义了消息是怎样在客户端和服务器端之间通信的，server用于从transport接收序列化的消息，根据protocol反序列化之，调用用户定义的消息处理器，并序列化消息处理器的响应，然后再将它们写回transport。Thrift模块化的结构使得它能提供各种server实现，有如下几个：
+Thrift是一个由FB在09年开源的序列化/RPC框架，具有优秀的跨语言特性，现在已经成为apache基金会的子项目。这里先对Thrift本身做个简单介绍，其主要包括四个组件：protocol，transport，processor和server，其中，protocol定义了消息是怎样序列化的，transport定义了消息是怎样在客户端和服务器端之间通信的，processor是用户实现的消息处理器，执行业务逻辑，server来组装这些组件，主要是从transport接收序列化的消息，根据protocol反序列化之，调用用户定义的消息处理器，并序列化消息处理器的响应，然后再将它们写回transport。
+
+本文主要关注server的实现，Thrift模块化的结构使得它能提供各种server实现，有如下几个：
 
 - TSimpleServer
 - TThreadPoolServer
@@ -28,6 +30,7 @@ acceptor接受client端的连接请求，并以round-robin方式选择一个sele
 selector线程的工作可以分为两部分。首先当acceptor交给它一个connection时，它监听着这个connection上的read事件，并为之attach一个状态机标识目前所处的thrift数据帧读取状态，当读完一次完整的thrift请求数据时，它构造一个任务并交给业务线程组去执行，这个任务干的事就是首先执行TProcessor的process方法，也就是实际的业务逻辑，然后通知selector线程：我的活干完了，剩下的活你继续。好的，接下来就是selector的第二部分工作，将任务执行结果数据write给connection。
 
 以上就是TTHreadedSelectorServer内部几种线程的分工，职责明确、简单清晰。下面将结合源码回答如下几个问题：
+
 - acceptor如何选择selector线程来做负载均衡
 - acceptor接受连接请求的策略是什么
 - acceptor怎么把一个connection注册给某个selector
