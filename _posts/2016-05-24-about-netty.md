@@ -6,7 +6,7 @@ category:
 tags: []
 ---
 # 关于netty
-好几月没写博客了，水篇杂文把，写点最近学到的：
+好几月没写博客了，这里水篇杂文（>_<），写点最近学到的：
 
 ## attributeMap的使用
 ChannelHandlerContext和Channel都继承了AttributeMap，也就是说他们都可以充当attributeMap。一般来说，一个channel就是一个链路（底层对应一个socket），它有一个业务handlers组成的pipeline，通常我们希望每个handler都是stateless的，这样handler对象就可以shared by everyone，然而有时handler有需要保存state的需求，那么此时可以利用pipeline上handler对象关联的context对象（也就是说每条pipeline上有这与handler数量相对应的context对象，在handler的override方法里都有context参数）来保存attribute。Channel对象的attribute有什么用呢，通常我们会把Channel对象保存在一个应用程序全局的地方，channel里的attribute就为我们提供了一种优雅实现保存连接属性的方法（比如之前的http的keepalive就可以放在着）。更多内容参见官方文档中[state management](http://netty.io/4.0/api/io/netty/channel/ChannelHandler.html)，以及[channelHandlerContext](http://netty.io/4.0/api/io/netty/channel/ChannelHandlerContext.html)
