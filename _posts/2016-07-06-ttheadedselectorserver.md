@@ -230,6 +230,9 @@ public void changeSelectInterests() {
 }
 {% endhighlight %}
 
+# 总结
+java的NIO使用起来和epoll很类似，相比之下使用netty可能要更直观些，另外netty使用direct buffer来存放数据，会比目前thrift server这种实现更高效些。google的[grpc-java](https://github.com/grpc/grpc-java)的最重要的一种Transport就是基于netty来实现的。
+关于grpc，扮演的角色和thrift这一套非常相似，文档也非常翔实，更多请参见它的[官网](http://www.grpc.io/)。
 
 
 
