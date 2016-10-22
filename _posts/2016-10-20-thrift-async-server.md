@@ -5,12 +5,15 @@ description: ""
 category: 
 tags: []
 ---
+# 背景
+在[Thrift Server](http://kapsterio.github.io/test/2016/07/06/ttheadedselectorserver.html)一文中，我结合源码介绍了thrift java lib里的几种server的，并详细介绍了TThreadedSelectorServer的实现。TThreadedSelectorServer将网络I/O和业务逻辑的执行分开，网络I/O基于异步事件驱动实现，而业务逻辑还是基于一组业务线程池，以阻塞、同步的方式执行。在thrift 0.9.1中引入了async processor，源自这个[issue](https://issues.apache.org/jira/browse/THRIFT-1972)。基于这个feature可以实现一个纯异步、事件驱动的server。相比于半同步、半异步的server，纯异步server将可以带来非常可观的性能提升。
 
 # 同步Processor
-先了解下TBaseProcessor，process是同步阻塞的，内部有个processMap: Map<String,ProcessFunction>，装着所有ProcessFunction，每个processFunction对应着一个业务接口。
-另外还有一个实际业务handler的实例。
+先了解下thrift的TBaseProcessor，它的process方法是同步阻塞的，内部有个processMap: Map<String,ProcessFunction>，装着所有ProcessFunction，每个processFunction对应着一个业务接口。另外它还有一个实际业务handler的实例。
 
 它的process方法代码如下：
+
+<!--more-->
 
 {% highlight java linenos %}
 public boolean process(TProtocol in, TProtocol out) throws TException {
@@ -187,6 +190,7 @@ public boolean process(final AsyncFrameBuffer fb) throws TException {
 }
 {% endhighlight %}
 注意到这个process是非阻塞的。
+
 ## AsyncFrameBuffer
 AsyncFrameBuffer继承自FrameBuffer，不同的是它的invoke不会阻塞invokers线程，因为它调用的是TAsyncProcessor的process。代码如下：
 {% highlight java linenos %}
@@ -280,5 +284,5 @@ public void sendResponse(final AbstractNonblockingServer.AsyncFrameBuffer fb, fi
 {% endhighlight %}
 那么谁来调用callback的onComplete呢？答案很简单，就是业务方法自己，在上面这个例子中iface.listClassifications(args.strategyID,resultHandler)实现时可以采用CompletableFuture或者RxJava等技巧实现异步回调通知resultHandler。
 
-## 后续
-我将在下一篇blog中结合一个proxy server的例子，介绍下async processor的使用，以及与原来的基于同步processor的server做下对比。
+## 待续
+我将在下一篇blog中结合一个proxy server的例子，介绍下async processor的使用，以及与原来基于同步processor的server在各个场景中做下性能对比。

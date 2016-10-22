@@ -7,7 +7,9 @@ tags: []
 ---
 # 背景
 最近对服务的逻辑进行了一些异步化改造，对依赖的thrift服务都改为异步调用，结合java8里提供的CompletableFuture，可以很方便地描述服务间的依赖关系。过程中对thrift的异步client实现细节产生兴趣，于是就有了这篇blog。
-在[Thrift Server]()一文中，我结合源码剖析了thrift的server组件中最常见的TThreadedSelectorServer的设计和实现。本文则关注的是thrift中提供了client。同步client非常简单，没什么值得研究的地方，因此本文将结合源码分析下异步client的实现。
+在[Thrift Server](http://kapsterio.github.io/test/2016/07/06/ttheadedselectorserver.html)一文中，我结合源码剖析了thrift的server组件中最常见的TThreadedSelectorServer的设计和实现。本文则关注的是thrift中提供了client。同步client非常简单，没什么值得研究的地方，因此本文将结合源码分析下异步client的实现。
+
+<!--more-->
 
 # thrift async client整体介绍和边界
 thrift会将idl文件按照指定语言生成一个AsyncClient类(是TAsyncClient的子类)，每个接口都对应其中的一个方法。在这些方法里做的事情都类似，即先创建对应的TAsyncMethodCall子类的实例，然后交给一个TAsyncClientManager实例来完成实际RPC通信。
@@ -128,10 +130,13 @@ private void timeoutMethods() {
 {% endhighlight %}
 
 # TAsyncMethodCall内部状态机迁移
-//画个状态迁移图
+
 - prepareMethodCall:数据准备，把要传给远程方法的参数对象按照使用的协议写入一段TMemoryBuffer中，然后计算数据size，初始化frameBuffer和sizeBuffer
+
 - start：状态机启动，由selector线程在每轮的eventloop中startPendingMethods方法中调用，将当前的transport注册到selector中。
+
 - transition：事件发生时的状态迁移，由selector线程在每轮的eventloop中transitionMethods方法里调用。代码很直观，如下：
+
 {% highlight java linenos %}
 protected void transition(SelectionKey key) {
     // Ensure key is valid
@@ -171,6 +176,7 @@ protected void transition(SelectionKey key) {
     }
 }
 {% endhighlight %}
+
 在doReadingResponseBody方法里，当全部数据都读完后调用callback的onComplete方法。中间有任何异常发生时，关闭transport，并调用callback的onError方法。从这里也可以看出，callback的onComplete方法、onError方法里不能有阻塞当前线程的操作。
 
 # 总结
