@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Thrift Server —— TTheadedSelectorServer"
+title: "Thrift Server —— TThreadedSelectorServer"
 description: ""
 category: 
 tags: []
