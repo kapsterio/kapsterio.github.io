@@ -249,7 +249,7 @@ public CompletableFuture<Integer> getResult() {
 ## more
 异步service除了在性能上面优于同步service之外，还有什么别的优势么？显然是有的，最为powerful的一点就是支持批量化处理。假设现在后端http连接资源是整个服务瓶颈，且这http接口支持传入list参数从而进行批量调用。此时，同步service里由于执行模型的限制，还是只能对每个client的请求发起一次对后端http接口的单个调用。相比之下，异步service就可以做到将client的请求先存入一个内存队列中，再由另外一个独立线程批量从队列里取出请求，构造批量调用后端http接口的参数，异步发起请求。这样做的好处在于将大大较少对后端http接口的压力，同时对服务中所需的后端http连接资源的依赖也将减少。之前写过一个批量发券服务[基于生产者-消费者模型的抵用券发券服务化](http://wiki.sankuai.com/pages/viewpage.action?pageId=461933580)就是基于这个思路。不同的地方在于vas服务实现基于netty，依赖的后端服务是数据库。
 
-
+最后，以上内容仅为一家之言，若持不同观点，欢迎探讨。
 
 
 
