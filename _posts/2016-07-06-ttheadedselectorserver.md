@@ -196,7 +196,7 @@ public void invoke() {
       TTransport inTrans = new TMemoryInputTransport(buffer_.array());
       TProtocol inProt = inputProtocolFactory_.getProtocol(inTrans);
       response_ = new TByteArrayOutputStream();
-      TProtocol outProt = outputProtocolFactory_.getProtocol(new TIOStreamTransport(response_));
+      TProtocol outProt = outputProtocolFactory_.getProtocol(outputTransportFactory_.getTransport(new TIOStreamTransport(response_));
 
       try {
         processorFactory_.getProcessor(inTrans).process(inProt, outProt);
@@ -213,7 +213,7 @@ public void invoke() {
 }
 {% endhighlight %}
 
-可以看出，它先从buffer_构造一个inputTransport，再从responese_这个输出字节流构造一个outputTransport（我觉得这里为了统一也可以从buffer_先构造一个inputStream，再从这个inputStream同样构造一个TIOStreamTransport作为inputTransport），然后在TProcessor的process方法中执行解析thrift协议、实际的业务逻辑（不需要我们操心了）。最后在responseReady方法里先把responese_赋给buffer_，以便后续select去write，然后通过requestSelectInterestChange方法通知selector线程去改变connection的感兴趣的I/O事件。
+可以看出，它先从buffer_构造一个inputTransport，再从responese_这个输出字节流构造一个outputTransport（注意这里的transport是通过outputTransportFactory构建的，而在构造server时传入的outputTransportFactory是一个能产生TFramedTransport的factory。意味着往这个包装了一层的transport里写数据时，在flush后自动加上4个字节的frame size信息，因此selector再去把内存中数据写到网络上时不需要再额外考虑frame size（状态机中也没有这个状态，我觉得也可以为状态机加一个write_frame_size状态，然后手动写frame_size，这样Server中就无需用到TFramedTransport了，当然client还是得指定TFramedTransport）），然后在TProcessor的process方法中执行解析thrift协议、实际的业务逻辑（不需要我们操心了）。最后在responseReady方法里先把responese_赋给buffer_，以便后续select去write，然后通过requestSelectInterestChange方法通知selector线程去改变connection的感兴趣的I/O事件。
 
 怎么去通知呢？其实Selector有个成员集合selectInterestChanges，它装着哪些需要改变I/O事件监听兴趣的frameBuffer，requestSelectInterestChange里只是简单地把frameBuffer添加到这个集合当中，由Selector在每轮的事件循环中遍历这个集合并处理，处理逻辑如下：
 {% highlight java linenos %}
