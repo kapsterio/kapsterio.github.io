@@ -85,6 +85,7 @@ TProcessor tAsyncProcessor = new TestAsync.AsyncProcessor<TestAsync.AsyncIface>(
 
 ## cpu密集型服务
 假设size方法的业务逻辑是对一字符串"hello"进行md5计算摘要
+
 异步service的性能:
 {% highlight c linenos %}
  INFO 2016-10-23 20:23:48 SimpleClient 50 time: 0 
