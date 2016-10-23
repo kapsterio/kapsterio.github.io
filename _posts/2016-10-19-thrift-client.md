@@ -39,6 +39,7 @@ public TAsyncClient(TProtocolFactory protocolFactory, TAsyncClientManager manage
 也就是说，从使用者角度来看，我们所需要为每个service构造一个clientManager、管理一个TNonblockingTransport的连接池，每次rpc调用先从连接池中取到一个连接，构造一个TAsyncClient子类的实例，然后调用其对应的方法并传入一个callback，执行rpc。
 
 从TAsyncClient内部实现角度来看，本文主要关注以下几个问题：
+
 - TAsyncClientManager内部是怎么管理多个pending call的
 - TAsyncClientManager是怎么对后端接口设置超时的
 - TAsyncMethodCall内部状态机迁移
