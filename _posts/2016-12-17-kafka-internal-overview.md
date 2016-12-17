@@ -82,6 +82,7 @@ kafka的消费者向partition的leader发起一个"fetch"请求，请求中指�
 这点上kafka遵从传统的设计，即数据由producer push到broker，consumer从broker上pull数据消费。一些以logging-centric的系统比如 Scribe和Apache Flume，则采用的是push-based方式将数据push给下游。
 
 这种pull-based的消费者的好处主要有：
+
 - 轻量级，消费者不会因消息发送速率过高而被overwhelmed，即便落后了，也能在后面catch up上来
 - 向消费者sent数据时可以做些激进的batching优化
 
@@ -91,14 +92,21 @@ kafka的消费者向partition的leader发起一个"fetch"请求，请求中指�
 对于第一个问题，kafka保证的是那些已经被committed进入log中的消息，能容忍副本数-1个节点的失败以至于不丢消息。同时kafka允许producer指定durability的级别，If the producer specifies that it wants to wait on the message being committed this can take on the order of 10 ms. However the producer can also specify that it wants to perform the send completely asynchronously or that it wants to wait only until the leader (but not necessarily the followers) have the message.
 
 对于第二个问题，consumer的不同的做法有着不同的语义保证：
+
 - 读完消息后，先保存position到broker，然后再处理消息。做到的at-most-once语义
 - 读完消息后，先处理，成功后保存position到broker，做到at-least-once语义
 - 引入two-phase commit协议保证exactly once
 
-总的来说，kafka默认保证at-least-once语义。So effectively Kafka guarantees at-least-once delivery by default and allows the user to implement at most once delivery by disabling retries on the producer and committing its offset prior to processing a batch of messages. Exactly-once delivery requires co-operation with the destination storage system but Kafka provides the offset which makes implementing this straight-forward.
+总的来说：
+
+> So effectively Kafka guarantees at-least-once delivery by default and allows the user to implement at most once delivery by disabling retries on the producer and committing its offset prior to processing a batch of messages. Exactly-once delivery requires co-operation with the destination storage system but Kafka provides the offset which makes implementing this straight-forward.
 
 
-## replication
+## Replication
+topic的一个partition是Kafka进行replication的最小单元，每个partition都有一个leader和0个或者多个followers，一个partition的所有replicas的个数被称为replication factor。所有的读和写操作都由leader来处理。通常而言，集群中有很多个topic，每个topic也有多个partition，数量远多于集群中broker节点数量，这些partition的leader均匀分布在各个broker上。这样一来，当集群中有broker节点失败时，Kafka能够使得受到影响的partition自动在其replicas间failover，从而保持partition的可用性。
+
+用分布式系统的术语来说，Kafka仅试图解决“fail/recover”类型的节点失败，即集群中节点由于某些原因停止正常工作（网络延迟、节点负载增高、fullgc等等），过一会还能够recover过来。Kafka不考虑拜占庭错误（"Byzantine" failure）。
+
 > A message is considered "committed" when all in sync replicas for that partition have applied it to their log. Only committed messages are ever given out to the consumer（注意这句话，只有committed的消息才会交给consumer）.This means that the consumer need not worry about potentially seeing a message that could be lost if the leader fails. Producers, on the other hand, have the option of either waiting for the message to be committed or not, depending on their preference for tradeoff between latency and durability. This preference is controlled by the acks setting that the producer uses. The guarantee that Kafka offers is that a committed message will not be lost, as long as there is at least one in sync replica alive, at all times.
 
 
