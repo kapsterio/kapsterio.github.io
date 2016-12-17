@@ -7,14 +7,17 @@ tags: []
 ---
 > WARNING: 本文完全来自Kafka的[官方文档](https://kafka.apache.org/documentation/#introduction)，结合自己的理解和提炼，属于二手知识，如果需要深入了解Kafka，建议直接阅读官方文档。主要关注两个部分：1）Kafka对外提供的行为和语义保证，2）Kafka的设计概要
 
-# introduction
-## 这里提炼出Kafka一些行为的要点：
+<hr/>
+# Introduction
 
+## Kafka一些行为的要点：
 kafka有个可配置的日志保留时间， 过了这个时间的日志，无论消费与否都被清除
 
 消费者维护的仅有的metadata就是offset，非常轻量级，所以不用担心消费者很多，kafka处理不过来的问题。
 
-partition的作用就是为了scale和并行，做到水平扩展，将一个topic的日志分布在多个partition中。每个partition会有多个副本，分布在集群中不同的机器上，副本的数量可配置。每个partition有一个server充当这个partition的leader，其他server则充当followers，leader负责这个partition的所有的读写请求，follower作用仅仅是被动复制leader，仅在leader挂掉时自动进行选主，其中一个follower将成为新的leader。
+<!--more-->
+
+partition的作用就是为了scale和并行，将一个topic的日志分布在多个partition中，做到水平扩展。每个partition会有多个副本，分布在集群中不同的机器上，副本的数量可配置。每个partition有一个server充当这个partition的leader，其他server则充当followers，leader负责这个partition的所有的读写请求，follower作用仅仅是被动复制leader，仅在leader挂掉时自动进行选主，其中一个follower将成为新的leader。
 
 生产者publish数据到指定的topic上，并且由它来负责将消息发往这个topic上的哪个partition，一般来说，可以使用round-robin方式来做简单的partition间的负载均衡，当然也可以按照一个特定的partition选择函数来确定发往的partition。
 
@@ -36,22 +39,26 @@ kafka仅提供一个partition内部的有序性保证，一个topic内多个part
 - kafka有着比传统MQ更强的顺序保证。传统mq将消息有序地存储在server上，如果多个消费者从这个队列中消费时，server会按照消息的存储顺序来hands out消息，然而当消息投递到多个消费者这个过程是异步时，消息到达消费者的顺序就乱了。这意味着消息的有序性因为并行消费的引入而被破坏了。传统MQ系统通常会通过“exclusive consumer”来work around，意味着同一个队列仅允许一个消费者。kafka的做法则好些，kafka做到per-partition的顺序性保证和消费组内部多个消费者之间的负载均衡。因为一个partition只会被消费组中的某一个消费者消费。另外，kafka中消费组中的消费者个数得小于partition数。
 
 ## kafka用作stream processing
-kafka的stream api使得kafka起到和apache storm类似的功能
+kafka的stream api使得kafka起到和apache storm类似的功能。更多stream的内容见[文档](https://kafka.apache.org/documentation/streams)。
 
-# kafka的设计
+<hr/>
+# Kafka的设计
 
-## 基于filesystem的数据结构实现线性存取，有效利用OS pagecache
-首先：使用jvm内存有如下缺点：
+## pagecache-centric design 
+基于filesystem的数据结构实现线性存取，有效利用OS pagecache。采用这个设计的原因主要由首先：使用jvm内存有如下缺点：
+
 - 内存开销很大，通常要double实际存储的数据空间
 - gc是个问题
 
 而基于filesystem有如下好处：
+
 - 有效利用os的pagecache来利用主存空间，另外由于数据紧凑，可以cache住很多数据，并且没有gc的压力
 - 即便服务重启了pagecache也还是热乎的，而放在jvm进程内存中则不一样，重启后需要重建整个数据结构
-- 一句话: **`rather than maintain as much as possible in-memory and flush it all out to the filesystem in a panic when we run out of space, we invert that. All data is immediately written to a persistent log on the filesystem without necessarily flushing to disk.`** 即 pagecache-centric design，以pagecache为中心的设计，类似的设计还有varnish
+- 一句话: **`rather than maintain as much as possible in-memory and flush it all out to the filesystem in a panic when we run out of space, we invert that. All data is immediately written to a persistent log on the filesystem without necessarily flushing to disk.`** 即以pagecache为中心的设计，类似的设计还有varnish
 
 ## sendfile的应用
 从disk到网络通常的数据transfer路径是这样的：
+
 1. The operating system reads data from the disk into pagecache in kernel space
 2. The application reads the data from kernel space into a user-space buffer
 3. The application writes the data back into kernel space into a socket buffer
@@ -110,15 +117,16 @@ kafka在选择commit decison的quorum set时所采取的方法有点不同，它
 
 ### durability vs availability
 假设我们运气不好，所有的replicas都fail了，而且不巧leader也挂了需要选主，此时将面临两个选择：
+
 - 等待ISR集中的replica恢复过来，选择这个节点作为新的leader
 - 选择最先恢复过来replica（不一定是ISR的）作为leader
 
 这就是一个简单的consistency和availability的tradeoff。默认情况下，kafka采用的是第二个策略，这种行为被称之为“unclean leader election”。当然kafka提供配置禁用掉这个行为。
 
 当durability的重要性高过availability时，可以采用如下两个topic-level的配置：
+
 - disable掉unclean leader election
 - 指定一个最小的ISR集大小，只要在ISR集大小大于这个值时kafka才提供写操作（这个配置需要和producer在ack级别是all才能真正起作用）
 
-
-### replica management
-上面关于Replicated log选主过程的讨论是仅针对单个topic的某个partition而言的，事实上，Kafka集群管理着成百上千个这样的partitions，分布在不同的broker节点上。也就是说集群中有很多的leaders，那么优化选主过程对可用性也是非常重要的。Kafka在集群的所有broker中选择一个broker作为“controller”，由这个controller在broker级别负责检测其他broker节点的fail情况，并负责给那些failed的broker上受到影响的partitions选主。这样做的结果就是所有选主操作都由controller负责，多个partition的leadership变动通知也可以做到批量发送，选主过程变得简单快速。如果controller失败了，那么剩下的broker节点将进行新的controller选举（即broker层面的选主）。
+## replica management
+上面关于Replicated log选主过程的讨论是仅针对单个topic的某个partition而言的，事实上，Kafka集群管理着成百上千个这样的partitions，分布在不同的broker节点上。也就是说集群中有很多的leaders，那么优化选主过程对可用性也是非常重要的。Kafka在集群的所有broker中选择一个broker作为“controller”，由这个controller在broker级别负责检测其他broker节点的fail情况，并负责给那些failed的broker上受到影响的partitions选主。这样做的结果就是所有选主操作都由controller负责，多个partition的leadership变动通知也可以做到批量发送，选主过程变得简单快速。如果controller挂掉了，那么剩下的broker节点将进行新的controller选举（即broker层面的选主）。
