@@ -125,6 +125,7 @@ translog还有一个作用，就是提供了按照id来CRUD文档时的实时性
 
 ## 简单谈谈分词(Analysis)
 这里所说的分词其实包含两个步骤：
+
 - 先对文本内按照配置的tokenizer进行tokenize，tokenizer的作用就是将原始内容切成一个个token
 - 再对每个token按照配置的token filters进行处理，可能会有各种filter，每种filter的职责也不尽相同，比如有的可能是为了去掉stop words、有的是为了生成同义词、有的是为了对单词去掉单复数前后缀等等、有的是为了支持特殊的检索需求，总之非常丰富。
 
