@@ -123,7 +123,7 @@ translog还有一个作用，就是提供了按照id来CRUD文档时的实时性
 
 那么还有一个问题：translog本身的数据安全怎么来保证？我们知道，translog的内容如果不通过fsync持久化到磁盘中的话，在机器重启后也会丢失。默认情况下，translog的内容会在每5秒fsync一次，看上去我们依然可能丢失最多5s内的translog数据。所幸的是，translog只是一个更巨大系统的一部分。前面也提到一个典型的写请求处理过程中只有当所有的主从副本都写入成功之后这次请求算完成，意味着同一个shard也有多个translog副本，如何保证translog数据安全和一致性是分布式一致性协议(distributed consensus algorithm)所解决的问题，是个非常大话题，学界和工业界也存在很多优秀的工作用来解决这个问题(从(multi-)paxos到raft、zk的zab等等)，es貌似也是自己搞了一套。
 
-## 简单谈谈分词(Analysis)
+### 简单谈谈分词(Analysis)
 这里所说的分词其实包含两个步骤：
 
 - 先对文本内按照配置的tokenizer进行tokenize，tokenizer的作用就是将原始内容切成一个个token
