@@ -187,7 +187,7 @@ $$queryNorm(q) =  \frac{1}{\sqrt[2]{sumOfSquaredWeights}}$$
 docLenNorm和docBoost项都是文档相关的，和query无关，因此在lucene的设计中，它两在每个doc写入索引时就已经计算好乘积，并且占用1个字节存储在索引文件中。统称为doc的index-time field-level Boost（即每个doc的每个field用1个字节来存储这个值）。docLenNorm计算很简单，为\\(\frac{1}{numOfTerms}\\)，就是这个doc的这个field中的term总数的倒数。docBoost默认为1，即不对doc的权重做任何改变，另外es官方也强烈反对去设置doc level的boost，所以建议忽略。
 
 ### tf
-tf(t,d)项在lucene中计算采用是frequency的平方根，frequency是就是term在doc的这个field里出现的次数。tf项也是在建索引时就计算好，存储在索引文件中的
+tf(t,d)项在lucene中计算采用是frequency的平方根，frequency是就是term在doc的这个field里出现的次数。tf项也是在建索引时就计算好，存储在索引文件中的。
 
 ### idf
 idf项在lucene中是通过如下公式计算得到：
