@@ -19,7 +19,7 @@ class: center, middle, inverse
 # What is Elasticsearch?
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ### - ES是什么
@@ -49,7 +49,7 @@ lucene本身只是全文检索的java lib，直接拿来用的话需要集成到
 - 提供了实时分析、聚合的功能 (aggregation)
 ---
 
-class: middle
+
 .left-column[
   ## Introduction
   ### - ES是什么
@@ -64,7 +64,7 @@ class: middle
 ]
 ---
 
-class: middle
+
 
 .left-column[
   ## Introduction
@@ -82,7 +82,7 @@ es可以配置shards的副本数，即每个shard都可以多个副本，以防�
 
 ---
 
-class: middle
+
 .left-column[
   ## Introduction
   ### - ES是什么
@@ -113,7 +113,6 @@ class: center, middle, inverse
 再继续介绍ES的indexing和searching之前，有必要先介绍下es的文档模型，尤其注意的是它和关系型数据库数据模型的异同。
 ---
 
-class: middle
 .left-column[
   ## Introduction
   ## document model
@@ -129,7 +128,7 @@ class: middle
 如果说关系型数据库的逻辑存储单元是一条条记录(record)的话，对应到es里的逻辑存储单元就是一个个文档(document)。document是lucene在indexing和searching时的逻辑单元，一个document可能包含一个或者多个fields，每个field的内容是我们的真正存储的数据（比如一篇文章有标题、内容、作者、日期等等fields），可能是整形、浮点型、字符串等等，另外可以针对field设置一系列选项用于告诉lucene怎么处理一个doc的这个field的内容（包括是否存储、是否需要被检索、是否分词、怎么分词等等）。lucene的倒排索引也是以field为单元的，在searching时自然也是以field为单元来进行检索的。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -153,7 +152,7 @@ class: middle
 ES中引入了index和type的概念，分别对应着关系型数据库中的库和表，使得更易管理索引，也更符合关系型数据库的使用习惯。这样一来ES数据模型和关系型数据库的数据模型就有如下所示的对应关系
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -180,7 +179,7 @@ class: middle
 dictionary很简单就是所有的term构成的集合，postings则是每个term对应的document list，最简单的postings的document list中只有doc id有序列表，用于解决boolean query问题（不涉及排序，仅回答term在哪些doc中出现）。实际应用中postings文件内容还可以包括term在doc中出现的频率、位置等等其他信息，用于解决更复杂的query、排序问题。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -198,7 +197,7 @@ class: middle
 ]
 ---
 
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -217,7 +216,7 @@ lucene实际存储postings时中采用是一种分段的结构(segmented-archite
 在检索的时候，每个segement都需要被访问一篇，最后汇总得到最终的结果，至于为什么采用这种结构见分段结构索引，后面会提到
 ---
 
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -239,7 +238,7 @@ class: center, middle, inverse
 # 文档是如何被索引的,  什么是分词
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -260,7 +259,7 @@ class: middle
 其中，第一步的行为完全由使用者来控制，在我们的应用中，数据完全来源自数据库，通过订阅kafka的促销数据变动通知将活动数据从数据库中读出再写入es中。针对第二、三步，lucene和es已经它们的一些插件提供了大量的组件和配置供用户选择来满足各种各样的检索需求；第四步则对于用户来说可以视为一个黑盒子，用户可以在不了解任何索引构建算法的前提下很好的了解和使用lucene和es
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -285,7 +284,7 @@ tokenizer结合token filters打包到一起就是所谓的analyzer，es基于luc
 analyzer供选择，如果有特殊需求的话，还可以自定义analyzer，也非常简单。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -314,7 +313,7 @@ shard = hash(routing) % number_of_primary_shards
 - node1收到node3的响应后，自己再返回结果给client
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -335,7 +334,7 @@ class: middle
 在这个例子中，当client收到成功响应时，文档已经所有的shard成功索引。数据已经安全可靠地存储在集群中。当然，es也提供了几个选项用于在写入性能和数据安全性之间进行tradeoff。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -362,7 +361,7 @@ class: center, middle, inverse
 ## 从文档被索引到文档可被检索的时间间隔多长
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -380,7 +379,7 @@ class: middle
 lucene的索引不仅包括多个segment文件，还包括一个commit point文件，commit point文件中列出所有的segments。处理读请求时会依次访问这些segments，然后汇总结果返回。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -396,7 +395,7 @@ class: middle
 简单地来说：lucene把整个文档集的索引分为多个段，每个段可能只是部分文档的索引倒排表。段和段之间会存在索引合并。段的组织方式类似于二项堆结构，即段大小以指数数量级递增，段合并发生在当索引中某一数量级大小的段文件存在两个时，此时这两个段文件将合并成一个更大的段。这样做带来的好处就是大段文件变动较少，还可以有效利用filesystem cache。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -412,7 +411,7 @@ class: middle
 任何写请求在写入segment文件前，会先写到内存中的一个index buffer中，结构如下图所示。只有当doc被写入segment文件后才能生效、被检索到，而index buffer只有在满了或者使用者通过api手动刷入时才能同步到文件中，意味着刚写入索引的文档不能立即被检索到（还是在index buffer中）
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -428,7 +427,7 @@ class: middle
 所幸es提供了refresh api，通过它可以把index buffer的数据写入操作系统内核的文件缓存中（write系统调用），此时这些内容就可以被检索到了。refresh是相对于提交索引(commit)而言轻量级的操作，默认情况下，es的每个shard都会每秒自动refresh一次，这也是为什么说es是近实时索引的。如果你很在意索引的实时性的话，也可以在写入文档后，立即发起一次refresh请求，但需要注意这也是有一定性能开销的。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -444,7 +443,7 @@ class: middle
 除了每秒refresh之外，为了避免节点故障（比如断电）导致的索引数据丢失，我们还需要定期提交索引(commit)，即将index buffer和filesystem cache中的数据刷到磁盘中(fsync系统调用)、同时写commit point文件，这样节点重启后也能在这个commit point处恢复过来。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -461,7 +460,7 @@ class: middle
 
 ES会将每个写操作都先记入translog中，然后在写入index buffer。
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -477,7 +476,7 @@ class: middle
 refresh请求会清空index buffer，写入数据到filesystem cache中，但是不会清空translog
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -495,7 +494,7 @@ class: middle
 translog还有一个作用，就是提供了按照id来CRUD文档时的实时性。当通过document id来取、更新、删除doc时，先check下translog，看看有没有最近的变动，然后再从对应的segment文件中取出对应的doc，也就是说，按照id来取文件的结果是实时的。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -524,7 +523,7 @@ class: center, middle, inverse
 search的内容就非常之丰富了，es基于lucene提供了各种各样的query和filter来满足各种各样的检索需求。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -546,7 +545,7 @@ class: middle
 下面将先从lucene的排序模型开始展开，然后在介绍一些常见的query和filter，再谈谈es分布式searching。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -567,7 +566,7 @@ $$score(q,d) = \frac{\vec{V(q)} \cdot \vec{V(d)}}{\|\vec{V(q)}\|\|\vec{V(d)}\|}$
 我们知道boolean query的话只需要按terms查出满足条件的文档就行可以了，然而实际应用我们往往还需要对结果集按照查询相关性进行排序，表达相关性最常用的方法就是基于所谓的vector space model，它将query string和文档内容都视作以query中出现的所有term为基的向量，然后计算两个向量的余弦距离，距离越近表示越相关。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -589,7 +588,7 @@ $$weight(t,d) = tf_{t,d} * idf_t$$
 向量权重内容就是由TF-IDF模型来确定的，它的思想很简单：TF（term frequency）表达的是term在query string或者对应的一篇文档内容中的出现频率，意味着在query string或者对应的文档内容中出现次数越多，权重越高。IDF（inverse document frequency）则是和term在整个文档空间中出现频率的倒数正相关，意味在整个文档空间出现次数越多的term，权重越低。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -610,7 +609,7 @@ class: middle
 基于这些考虑，Lucene提出所谓的Lucene's Practical Scoring Function：
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -662,7 +661,7 @@ idf项在lucene中是通过如下公式计算得到：
 queryBoost(t)项前面也都介绍了，在检索时可以为query中的某些term提升权重，queryBoost(t)默认值也是1，即不改变权重。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -680,7 +679,7 @@ class: middle
 前面详细介绍基于VSM的tf-idf算分模型，在实现上，我们一般会给query传入limit参数，lucene的做法是在内存中先建一个小根堆（大小是limit），然后按terms从倒排表中依次取出所有的匹配的文档，放入小根堆中排序，最后小根堆中元素就是score是TOP K（K=limit）的文档。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -700,7 +699,7 @@ class: middle
 实际上，有时一个query匹配到的结果集可能非常之大，为结果集中每个文档准确地算分再排序是一件非常耗时、其没那么重要的事（大部分时候我们只需要获取前几页的结果），因此很多搜索引擎都会应用一些启发式策略来加快这一过程，代价就是取出的top K个结果不一定是严格精确的（这也是一种典型的tradeoff，以精度换时间）。基本上所有的启发式策略都会遵从这一模式：先确定一个大小为A的候选结果集，再从这个候选结果集里找出TOP K的文档返回，其中 K < A << N，N是匹配文档的总数。更具体的内容见An Introduction to Information Retrieval的第七章中efficient scoring and ranking。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -726,7 +725,7 @@ class: middle
 
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -748,7 +747,7 @@ class: middle
 es还提供了一些其他的简单query和复合query，这里不再列举了，更多内容参考es官方文档和ElasticSearch the definitive guide一书。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -771,7 +770,7 @@ class: middle
 所以，建议就是能用filter的地方就取用filter。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -794,7 +793,7 @@ query阶段是由协调节点发起的，它向集群中索引的所有的shard�
 - 每个shard在本地执行query，取出TOP offset+limit排好序的结果，返回给node3，由node3将这些结果merge进行自己的小根堆中，得到全局有序的TOP offset+limit结果集。至此query phase结束
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
@@ -818,7 +817,7 @@ class: middle
 - 当协调节点收到所有文档结果后，汇总返回给client。
 
 ---
-class: middle
+
 .left-column[
   ## Introduction
   ## document model
