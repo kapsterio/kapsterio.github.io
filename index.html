@@ -5,7 +5,7 @@ paginate_path: "page:num"
 
 <ul class="post-list">
     {% for post in paginator.posts %}
-    
+    {% if post.category != "slide" %}
       <li>
         <h2>
           <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
@@ -16,7 +16,7 @@ paginate_path: "page:num"
           {{post.content | split:'<!--more-->' | first}}
           <h7><a href='{{post.url}}' class="more-link">read more...</a></h7>
       </li>
-    
+    {% endif %}
     {% endfor %}
 </ul>
 
