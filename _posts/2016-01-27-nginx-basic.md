@@ -2,7 +2,7 @@
 layout: post
 title: "nginx basic"
 description: ""
-category: 
+category: [nginx]
 tags: []
 ---
 

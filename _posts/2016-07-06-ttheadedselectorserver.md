@@ -2,8 +2,8 @@
 layout: post
 title: "Thrift Server —— TThreadedSelectorServer"
 description: ""
-category: 
-tags: []
+category: [thrift]
+tags: [TThreadedSelectorServer]
 ---
 # 背景
 Thrift是一个由FB在09年开源的序列化/RPC框架，具有优秀的跨语言特性，现在已经成为apache基金会的子项目。这里先对Thrift本身做个简单介绍，其主要包括四个组件：protocol，transport，processor和server，其中，protocol定义了消息是怎样序列化的，transport定义了消息是怎样在客户端和服务器端之间通信的，processor是用户实现的消息处理器，执行业务逻辑，server来组装这些组件，主要是从transport接收序列化的消息，根据protocol反序列化之，调用用户定义的消息处理器，并序列化消息处理器的响应，然后再将它们写回transport。

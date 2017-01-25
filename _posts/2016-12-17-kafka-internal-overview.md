@@ -2,7 +2,7 @@
 layout: post
 title: "Kafka internal overview"
 description: ""
-category: 
+category: [kafka]
 tags: []
 ---
 > WARNING: 本文完全来自Kafka的[官方文档](https://kafka.apache.org/documentation/#introduction)，结合自己的理解和提炼，属于二手知识，如果需要深入了解Kafka，建议直接阅读官方文档。主要关注两个部分：1）Kafka对外提供的行为和语义保证，2）Kafka的设计概要

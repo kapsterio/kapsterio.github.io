@@ -2,7 +2,7 @@
 layout: post
 title: "Basic of Elasticsearch"
 description: ""
-category: 
+category: [elasticsearch]
 tags: [lucene,elasticsearch,full text search]
 ---
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default" async></script>

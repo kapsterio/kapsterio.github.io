@@ -2,7 +2,7 @@
 layout: post
 title: "nginx cache using"
 description: ""
-category: 
+category: [nginx]
 tags: []
 ---
 ## nginx缓存的使用

@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "hello world"
+title: "编译原理课堂笔记"
 description: ""
-category: 
-tags: []
+category: [lesson]
+tags: [compiler]
 ---
 {% include JB/setup %}
 
@@ -13,6 +13,8 @@ tags: []
 
 
 算法伪码：
+
+{% highlight c linenos %}
 tokens[];
 i=0;
 stack = [s] //s是开始符号
@@ -27,9 +29,11 @@ while (stack !=  []) {
         if (there is no rhs of T any more) backtrack(); //这里回溯掉产生包含T的的产生式。可能需要另外一个栈来记住产生式选择以方便回溯
     }
 }
+{% endhighlight %}
 
 
 算法比较昂贵，我们需要线性时间的算法：
+
 - 避免回溯
 - 引出递归下降分析算法和LL1分析算法
 
@@ -38,13 +42,19 @@ while (stack !=  []) {
 
 - 问题：怎么根据前看字符来选择产生式？
 对算术表达式的递归下降分析
+
+{% highlight c linenos %}
 E -> E + T
     | T
 T -> T * F
     | F
 F -> num
+{% endhighlight %}
+
 
 可以看成： E -> T + T + T + .... + T, T -> F * F * ... * F
+
+{% highlight c linenos %}
 parse_E() {
     parse_T();
     token = tokens[i++];
@@ -53,8 +63,9 @@ parse_E() {
         token = tokens[i++];
     }
 }
+{% endhighlight %}
 
-
+{% highlight c linenos %}
 parse_T() {
     parse_F();
     token = tokens[i++];
@@ -63,6 +74,7 @@ parse_T() {
         token = tokens[i++];
     }
 }
+{% endhighlight %}
 
 - 为什么递归下降只需扫描一次输入流，看书时思考下
 递归下降其实就是上一节的自顶向下的算法的递归版本，区别在于对非终结符产生式的选择，自顶向下算法中栈模拟的就是这个递归调用过程，产生式的选择也是盲目的一个个尝试。
@@ -77,10 +89,13 @@ parse_T() {
 
 ### 表怎么生成
 定义非终结符的first集:
-对 N -> a... : first(N) U= {a}
-对 N -> M... : first(N) U= first(M) 
+
+- 对 N -> a... : first(N) U= {a}
+- 对 N -> M... : first(N) U= first(M) 
 
 伪码：(不动点迭代算法)
+
+{% highlight c linenos %}
 foreach (nonterminal N) {
     first (N) = {};
 }
@@ -94,24 +109,33 @@ while (some set is changing) { //迭代的终止条件是没有集合发生变�
         }
     }
 }
+{% endhighlight %}
+
 思考：怎么证明算法正确且能终止
 
 定义任意串的first集：
+
+{% highlight c linenos %}
 first_s(beta1...betan) = 
     first(N), if beta1 == N;
     {a}, if beta1 == a;
+
+{% endhighlight %}
 
 构造LL(1)分析表：
 遍历每个production p，将分析表中行位p左部，列在p右部的first集中的元素填上p
 
 定义NULLABLE集：
 非终结符X属于集合NULLABLE，当且仅当：
+
 - 基本情况：
     X -> 
 - 归纳情况：
     X -> Y1 ... Yn, Y1 ... Yn都属于NULLABLE集
 
 NULLABLE集构造算法：
+
+{% highlight c linenos %}
 NULLABLE = {};
 while (nullale is still changing) {
     foreach (production p : X -> beta)
@@ -122,7 +146,10 @@ while (nullale is still changing) {
                 NULLABLE U= {X};
 }
 
+{% endhighlight %}
+
 现在重新redine下非终结符的first集的定义：
+
 - 基本情况:X -> a 
     firsr(X) U= {a}
 - 归纳情况:X -> Y1 ... Yn
@@ -132,6 +159,7 @@ while (nullale is still changing) {
     - ....
 
 那么非终结符first集构造算法redine后如下：
+{% highlight c linenos %}
 foreach (nonterminal N)
     first(N) = {};
 while (some set is changing) {
@@ -144,27 +172,40 @@ while (some set is changing) {
             }
         }
 }
+
+{% endhighlight %}
+
 思考：怎么证明算法正确，并且能终止？1）集合元素有限，因此算法肯定能终止 2）反证法证明当算法终止时，结果集合就是要求的目标集合
 
 
 
 
 OK, 有了非终结符的first集完整定义和构造算法后，来分析串的first_s集：
+
 原来的定义是：对于N -> beta1 ... betan
 first_s(beta1...betan) = 
     first(M), if beta1 == M;
     {a}, if beta1 == a;
+
 现在beta1可能是NULLABLE，同样beta2、...、betan都可能是NULLABLE的，first_s除了可能包含betai的first集外，还可能包含串之外的非终结符，即follow(N)。因此引入follow集的概念
 
 非终结符follow集：非终结符后可能跟随哪些终结符构成的集合
+
 这里可以先定义每个产生式右部符号的temp集,对于产生式 N -> beta1 ... betan而言：
+
 基本情况: temp(betan) = follow(N)
+
 归纳情况: 
+
 - if betai+1 is terminal, temp(betai) = {betai+1}
 - if betai+1 is nonterminal && betai+1 is not NULLABLE, temp(betai) = first(betai+1)
 - if betai+1 is nontermianl && betai+1 is NULLABLE, temp(betai) = first(betai+1) U temp(betai+1)
+
 temp集是干嘛的呢？每个非终结符的follow集必定包含它所在的每个产生式中它的temp集。
 因此，对于非终结符的follow集构造算法如下：
+
+{% highlight c linenos %}
+
 foreach (nonterminal N) 
     follow(N) = {};
 while (some set is changing) {
@@ -183,7 +224,11 @@ while (some set is changing) {
 
 }
 
+{% endhighlight %}
+
 最后，给出串的first_s集算法：
+
+{% highlight c linenos %}
 foreach (production p) 
     first_s(p) = {};
 
@@ -201,8 +246,13 @@ calculate_first_s (production p : N -> beta1 ... betan) {
     first_s(p) U= follow(N);//为什么需要并上follow(N)，此时p可以推出空，结合下first_s的作用就知道了为什么了
 }
 
+{% endhighlight %}
+
 
 现在，终于可以构造LL(1)分析表了，其实和之前完全一样。那么LL(1)分析器的算法框架如下：
+
+{% highlight c linenos %}
+
 tokens[];
 i=0;
 stack = [s] //s是开始符号
@@ -216,6 +266,8 @@ while (stack !=  []) {
         push(table[T, tokens[i]]); //将table[T, tokens[i]]号产生式的右部逆序压栈
     }
 }
+
+{% endhighlight %}
 
 ### 冲突处理
 改变文法以去掉冲突

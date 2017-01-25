@@ -2,7 +2,7 @@
 layout: post
 title: "about netty"
 description: ""
-category: 
+category: [netty]
 tags: []
 ---
 # 关于netty

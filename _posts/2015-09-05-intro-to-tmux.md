@@ -1,9 +1,9 @@
 ---
 layout: post
-category : lessons
+category : prductivity
 title : TMUX的一点总结
-tagline: "Supporting tagline"
-tags : [intro, beginner, jekyll, tutorial]
+tagline: ""
+tags : [tmux, helloworld]
 theme :
   name : bootstrap-3
 ---

@@ -2,7 +2,7 @@
 layout: post
 title: "lock and condition"
 description: ""
-category: 
+category: [concurrent]
 tags: []
 ---
 # 锁和条件变量

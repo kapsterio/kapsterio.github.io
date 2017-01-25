@@ -2,7 +2,7 @@
 layout: post
 title: "cURL in PHP and HttpClient in Java"
 description: ""
-category: 
+category: [httpclient]
 tags: []
 ---
 ## 背景

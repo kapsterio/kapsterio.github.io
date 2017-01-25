@@ -2,7 +2,7 @@
 layout: post
 title: "thrift async server"
 description: ""
-category: 
+category: [thrift]
 tags: []
 ---
 # 背景
