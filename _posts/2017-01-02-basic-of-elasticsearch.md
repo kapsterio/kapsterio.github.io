@@ -7,6 +7,8 @@ tags: [lucene,elasticsearch,full text search]
 ---
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default" async></script>
 
+> 本文对应的slide见：[Basic of Elasticsearch slide](http://kapsterio.github.io/slide/es)
+
 # Introduction
 
 ## es是什么
