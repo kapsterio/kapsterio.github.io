@@ -1,0 +1,141 @@
+---
+layout: presentation
+title: "netty pipeline"
+permalink: /slide/netty-pipeline
+description: ""
+category: slide
+tags: []
+---
+
+class: center, middle, inverse
+
+# Netty Handler Pipeline
+zhangheng5
+.footnote[Power by Remark.js & MathJax.js]
+
+???
+今天给大家分享下netty handler pipeline(号称是netty的血管)这个组件使用和源码实现，大概按照这个脉络来展开
+
+---
+.left-column[
+  ## Outline
+]
+.right-column[
+  ## - Introduction & API
+  
+  ## - Websocket Example
+
+  ## - Implementation
+]
+???
+首先对netty做下简单介绍，包括netty的eventloop和pipeline，然后着重介绍下pipeline涉及的一些api
+
+然后以netty的对websocket的实现来学习下netty pipeline的使用姿势，领略下pipeline的强大和易用
+
+最后跟着源码解读下netty handler pipeline的设计和实现
+
+期望能够收获一些解耦、API设计、性能优化相关的技巧
+
+---
+
+.left-column[
+  ## Introduction & API
+  ### - EventLoop
+]
+.right-column[
+
+  ![text](/public/fig/eventloop.png)
+]
+???
+先简单做些netty背景知识的介绍，相信大家都应该比较了解，首先是eventloop。
+
+eventLoop就是事件循环，号称是netty的心脏，通常一个eventloop就是由一个单独的线程，这个线程的run方法就是不断地wait事件发生，然后处理。
+
+图中是一个典型的netty server端的eventloop构成。
+
+server端通常有两种channel，一种是ServerChannel，就是server的listening socket，负责listen本地端口，接受client的连接。
+
+另外一种就是普通的channel，也就是实际和客户端进行数据通信的connection socket
+
+图中server channel注册到eventloopgroup的一个eventloop上，在server channel上的所有client建连事件都将由这个eventloop代表的线程处理。怎么处理呢？
+
+其实就是accept得到一个新的连接，构造一个新的channel，再从这个eventloopgroup中选择一个eventloop，将channel注册到这个eventloop上，此后该channel的所有I/O事件和用户事件都将由这个evenetloop处理。
+
+---
+.left-column[
+  ## Introduction & API
+  ### - Handler Pipeline
+]
+.right-column[
+
+  ![text](/public/fig/nettypipe.png)
+
+  ![text](/public/fig/nettycontext.png)
+
+]
+???
+当一个channel初始化时，随之就会为他新建一个handler pipeline，并在这个channel被register到eventloop中时按照用户在bootstrap时的配置来安装好这个pipeline。
+
+handler pipeline从设计模式上说是 interception filter pattern(拦截器模式)的一种，从逻辑结构上说他是一个由各种handler组成的链条。而handler本身则是一个个实现了各种用户回调方法的逻辑处理单元。包括编解码器、各种业务逻辑处理。
+
+netty4的handler又分为两类：一类是处理inboud事件（读事件）的ChannelInboundHandler，一类是处理oubound(写事件)的ChannelOutboundHandler。
+
+可以将图左边看做是网络，右边是应用程序。网络上一个数据包过来后先经过解码，生成消息，再被应用程序处理生成响应，响应先再经过一系列handler处理、编码成数据包写到网络中。
+
+还可以看到pipeline有head和tail两个指针，表示pipelien的头和尾，inbound事件是从head开始执行，outbound事件则是从尾开始执行。
+
+
+实际上，handler pipeline内部不是直接存的handler的链表，而是ChannelHandlerContext对象的链表。在每个handler被add到pipeline时就会创建一个ChannelHandlerContext对象，并作为节点被插到pipeline内部的链表中。
+
+可以通过这个ChannelHandlerContext对象向pipeline中的下一个handler触发消息，从而使得事件能在pipeline上传播和被处理。
+
+这个设计个人觉得也很值得学习。
+
+- 解耦handler和handler pipeline，这样一来，handler是一个完全由用户回调代码和handler本身状态构成的实例，handler通过ChannelHandlerContext来访问pipeline、进行消息、事件传播。
+- 将在pipeline上传播消息的权利交给handler本身，使得handler能够对消息进行聚合和拆解，一个典型的场景就是处理半包，只有等到当数据包完全到达后才不会向pipeline中下一个handler触发读事件。
+- 另外，我们可以在应用程序包保存特定handler的ChannelHandlerContext的引用，从而在触发事件时可以跳过某些不必要的handler，获取性能提升。
+
+
+
+
+
+
+
+---
+
+
+.left-column[
+  ## Introduction & API
+  ### - pipeline API 
+]
+.right-column[
+  ### operator
+  #### - addLast addFirst addBefore addAfter remove replace ...
+  
+  ### trigger
+  #### - trigger inbound event: fireXXXX ....
+  #### - trigger outbund event: write writeAndFlush  close connect ...
+
+]
+???
+pipeline最灵活的地方在于提供用户配置和动态修改pipeline的能力。这里我把pipeline的主要API分为两类，operator用于配置、修改pipeline，比如
+
+tirgger是用于触发inbound或者outbound事件，使得事件依次被pipeline上的handler处理。
+
+ChannelHandlerContext中则基本只有trigger相关的API
+
+---
+
+class: center, middle, inverse
+
+# Websocket Example
+
+???
+下面以netty对websocket的支持来学习下netty开发者对pipeline api的使用方法。之所以选择websocket的例子，是因为websocket 会涉及到链路的一次
+从http到websocket的协议切换，需要动态地操作handler pipeline
+
+---
+
+class: center, middle, inverse
+
+# Concluding
