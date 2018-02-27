@@ -1,0 +1,838 @@
+---
+layout: presentation
+title: "Introduction to Machine Learning"
+permalink: /slide/mr
+description: ""
+category: slide
+tags: [mr]
+---
+
+class: center, middle, inverse
+
+# Brief Introduction to Machine Learning
+zhangheng
+.footnote[Power by Remark.js & MathJax.js]
+
+???
+第一回答是什么
+第二回答怎么做
+
+---
+class: center, middle, inverse
+
+# what is machine learning?
+
+---
+
+.left-column[
+  ## Introduction
+  ### - MR是什么
+]
+.right-column[
+ #### 机器学习一门从数据中学习解决问题方法的科学（艺术/玄学）
+
+ > A computer program is said to learn from experience E with respect to some task T and some performance measure P, if its performance on T, as measured by P, improves with experience E.
+
+ > —— Tom Mitchell, 1997
+
+以垃圾邮件过滤为例：
+
+- T: 对垃圾邮件的进行识别
+
+- E: 训练所需的样本数据，历史垃圾邮件和正常邮件
+
+- P: 识别的准确率： 测试样本集中正确分类的邮件数 / 测试样本集总邮件数
+]
+
+???
+机器学习一门从数据中学习解决问题方法的科学（艺术/玄学），不需要程序员显示地编写解决这个特定问题的规则，而是根据历史数据来学习出
+规则，Tom Mitchell 在1997年给出一个更精准通用的定义：
+翻译过来就是，机器学习是这样的一种计算机程序，他
+
+---
+.left-column[
+  ## Introduction
+  ### - why MR
+]
+.right-column[
+ ### 传统基于规则的方法 vs 机器学习方法
+
+- 传统基于规则的方法需要显式编写大量复杂的业务规则，难于维护，机器学习方法则是从数据中学习出表征垃圾邮件的规则和因素，程序易维护、准确率高
+
+.left[
+<img src="/public/fig/mr_1.png" width="400" height="250"> 
+]
+
+.right[
+<img src="/public/fig/mr_2.png" width="400" height="250">
+]
+
+]
+
+???
+TODO
+
+---
+.left-column[
+  ## Introduction
+  ### - why MR
+]
+.right-column[
+ ### 传统基于规则的方法  vs  机器学习方法
+
+- 机器学习方法可以使得获取数据、训练模型这一迭代过程自动化，即模型是随着数据自我进化的
+
+- 机器学习可以帮助人们去更好的理解业务问题、发现新的模式、洞悉数据规律（数据挖掘）
+
+.left[
+<img src="/public/fig/mr_3.png" width="400" height="250"> 
+]
+
+.right[
+<img src="/public/fig/mr_4.png" width="400" height="250">
+]
+
+]
+
+???
+TODO
+
+---
+.left-column[
+  ## Introduction
+  ### - types of MR systems
+]
+.right-column[
+### 机器学习系统分类依据
+
+- 训练过程涉及到人工介入程度
+   - <font color=red>supervised learning （分类、回归）</font>
+   - unsupervised learning （聚类、降维、关联规则挖掘）
+   - semisupervised learning
+   - reinforcement learning (alphaGo)
+
+- 是否能够做到增量学习
+  - online vs batch learning
+
+- 根据对新的样本数据怎么做预测
+  - instance-based vs model-based learning
+
+]
+???
+什么意思呢，一般而言训练过程需要大量样本数据，如果样本数据是带标记的（即已经事先给出每个样本对应的问题答案了）那么就是有监督学习
+样本数据没有标记就是无监督学习、部分有标记半监督学习
+
+
+
+---
+.left-column[
+  ## Introduction
+  ### - supervised learning
+]
+.right-column[
+### 分类 vs 回归
+
+.left[
+<img src="/public/fig/mr_7.png" width="400" height="250"> 
+]
+
+.right[
+<img src="/public/fig/mr_8.png" width="400" height="250">
+]
+
+]
+???
+典型的有监督学习比如分类、回归，分类回答的是一个样本属于既定类别中的哪一类，比如判断邮件是否是垃圾邮件
+回归预测的是一个样本对应的目标数值，比如根据房屋信息预测他的价格、根据一个人的体验信息预测一个人的血糖值
+
+通常而言，一个算法能解决回归问题，那他也能解决分类问题，大部分情况是两者是互通的，比如我们经常逻辑回归（LR）去解决分类问题
+
+
+---
+.left-column[
+  ## Introduction
+  ### - Supervised Learning
+]
+.right-column[
+### 几种典型的算法
+
+- K-Nearest Neighbors
+
+- Linear Regression
+
+- Logistic Regression
+
+- Support Vector Machine (SVM)
+
+- Decision Trees
+
+- Neural Networks （NN/DL）
+
+]
+???
+这里列举了几种典型的耳熟能详的监督学习算法
+K邻近思想很简单，甚至都没有训练过程，对新样本预测过程的算法思想用一句话就能描述，就是找到与这个样本距离最近的K个样本，看这K个样本都属于哪一类，选择最多的那个类别
+其他几种算法都是基于模型，即算法先根据历史样本数据训练一个模型，再由模型来对新样本的类别/目标值做出预测
+其中线性回归最简单，又叫最小二乘法，后面也会简单介绍下算法
+逻辑回归和线性回归类似，在线性回归基础上加了一个logistic funtion，用于输出概率，逻辑回归经常被解决分类问题
+
+支持向量机是一种老牌传统机器学习算法，适用于样本规模较小的分类问题，和线性回归、逻辑回归一样本身都是线性模型
+
+决策树是也是老牌传统机器学习算法，他是树算法家族中最基本的一种，其思想是根据历史样本数据按照某一贪心策略训练出一棵用于预测的（分类树或者回归树）
+基于决策树，可以有很多树模型融合的扩展：比如常见的随机森林、各种提升树，也是一个很大的话题，暂不展开
+
+最后就是最近这些年火的不行的神经网络，改头换面叫做深度学习，其实早在1986年神经网络的基石——反向传播算法就已经提出来了，引起广泛关注后热度又逐渐冷淡，并没有什么实质性的应用
+，反而这时候上面这些统计学习算法在各个领域得到广泛应用，直到2011-12年DL的一些高端技法CNN、RNN开始在语音、图像数据集上的碾压传统机器学习算法又焕发第二春，于是有了今天这个提到机器学习
+好像就是在说深度学习的局面
+
+算法细节今天就不展开了
+
+
+---
+.left-column[
+  ## Introduction
+  ### - types of MR systems
+]
+.right-column[
+### 机器学习系统分类依据
+
+- 训练过程涉及到人工介入程度
+   - supervised learning （分类、回归）
+   - <font color=red>unsupervised learning （聚类、降维、异常检测）</font>
+   - semisupervised learning
+   - reinforcement learning (alphaGo)
+
+- 是否能够做到增量学习
+  - online vs batch learning
+
+- 根据对新的样本数据怎么做预测
+  - instance-based vs model-based learning
+
+]
+???
+第二类是无监督学习，就是给定是一堆不带标记的数据，让算法自己根据这些数据内在的结构训练出模型，从而来回答每个样本对应的问题答案
+
+---
+.left-column[
+  ## Introduction
+  ### - unsupervised learning
+]
+.right-column[
+### 聚类
+
+  - K-Means
+
+  - Expectation Maximization (EM)
+
+.left[
+<img src="/public/fig/mr_9.png" width="400" height="300"> 
+]
+
+.right[
+<img src="/public/fig/mr_10.png" width="400" height="300">
+]
+
+]
+???
+比如典型的聚类问题，就是把一堆无标记的样本数据，根据样本间距离来将整个样本集归聚为几个类别，典型应用比如新闻文章的自动聚类
+
+---
+.left-column[
+  ## Introduction
+  ### - unsupervised learning
+]
+.right-column[
+### 降维
+
+- 数据的可视化
+- 作为其他机器学习任务的数据预处理过程
+- 数据有损压缩
+
+.left[
+<img src="/public/fig/mr_5.png" width="300" height="300"> 
+]
+
+.right[
+<img src="/public/fig/mr_6.png" width="300" height="300">
+]
+
+]
+???
+降维这个概念听上去有点抽象，其实也很简单，假设有这样的一个三维数据点组成的样本集，这些点基本上都分布在同一个平面上
+那么如果能找到这个平面的一组基，使得原来的数据样本能够用这组基来表示，这就是降维过程。
+
+降维里面最常用的算法名字叫PCA （主成分分析），干的其实就是就是利用线性代数找到这样的一组基
+
+降维不需要预先对样本进行标记，所以也归到无监督学习算法中，那么降维的作用有哪些呢，几个典型的应用有：
+第一，数据的可视化，我们知道高维数据是不大容易可视化的，降维则提供了一种途径，把高维数据降至3维内
+
+第二，降维通常用作其他机器学习任务的数据预处理过程，好处是可以加快机器学习算法的迭代速度
+
+第三, 数据的有损压缩，例子中三维数据现在降至二维，所需的存储空间减小了
+
+
+---
+.left-column[
+  ## Introduction
+  ### - unsupervised learning
+]
+.right-column[
+### 异常检测
+
+<img src="/public/fig/mr_11.png" width="650" height="500">
+
+]
+???
+异常检测也是一种重要的无监督学习任务，常备应用于金融、风控中交易欺诈检测、异常用户行为检测，有时也作为其他机器学习任务的数据预处理步骤
+保障组之前做的流量探测报警就是典型的异常检测问题
+
+
+---
+.left-column[
+  ## Introduction
+  ### - types of MR systems
+]
+.right-column[
+### 机器学习系统分类依据
+
+- 训练过程涉及到人工介入程度
+   - supervised learning （分类、回归）
+   - unsupervised learning （聚类、降维、异常检测）
+   - <font color=red>semisupervised learning</font>
+   - <font color=red>reinforcement learning (alphaGo)</font>
+
+- 是否能够做到增量学习
+  - online vs batch learning
+
+- 根据对新的样本数据怎么做预测
+  - instance-based vs model-based learning
+
+]
+???
+半监督学习其实就是处理部分标记的数据集，通常是组合一些无监督学习和有监督学习方法，不多说了
+最后是强化学习，这是个比较特殊的怪兽，最近几年随着alphaGo的突出表现广受关注，媒体提到人工智能一般就是在说他
+
+ok,上面是划分机器学习问题最常用的分类，当然还有一些其他的分类方式，比如如果按照模型能否做的增量学习可以划分为
+在线学习和批量学习（又叫离线学习）
+所谓的批量学习就是训练过程是离线的、批量的，跑个模型需要全量的训练样本数据，这也是我们目前的做法
+
+
+---
+.left-column[
+  ## Introduction
+  ### - online vs offline
+]
+.right-column[
+### 在线学习
+
+<img src="/public/fig/mr_12.png" width="650" height="480">
+
+]
+???
+在线学习是能够做到来一个样本、就增量更新一次模型，学习过程每步都很轻量级、计算代价很小。在线学习的适用于
+数据是以实时流式的方式不断产生的应用，大部分互联网应用都是这样，所以在线学习现在已经广泛应用于各大厂的核心机器学习应用
+。。。
+通常在线学习的实施可能是这样的，在冷启动阶段根据一堆数据训练出一个模型，并发布上线。这部分和批量学习没区别，不同地方在这
+应用通过kafka 加上一个实时计算框架比如apache flink storm做对模型进行增量更新
+
+好处就是模型可以及时地反应真实数据的变化
+
+
+---
+.left-column[
+  ## Introduction
+  ### - instance-based vs model-based
+]
+.right-column[
+### 基于实例 vs 基于模型
+
+.left[
+<img src="/public/fig/mr_13.png" width="420" height="300"> 
+]
+
+.right[
+<img src="/public/fig/mr_14.png" width="420" height="300">
+]
+
+]
+???
+按照对新样本数据怎么做预测来划分的话，也有两种，基于实例的学习和基于模型的学习
+基于实例的典型代表就是前面的提到的K-邻近，他简单到都没有训练过程，以垃圾邮件识别为例，
+有一堆带标记的邮件样本，来一个新邮件后，找到和这个新邮件最相似的K个样本，看哪个类别出现的最多
+
+核心在于怎么度量样本的相似度以及领域搜索算法
+
+基于模型的学习则需要根据样本数据训练出一个能进行预测的模型出来。大部分机器学习算法都是这种，我们也重点关注
+
+
+
+---
+class: center, middle, inverse
+
+# what model is?
+
+???
+那么模型到底是什么的？目前为止，模型还是个黑盒子，前面也提到了不少种基本算法，一般来说每种算法对应的这个模型黑盒子
+都还不一样，接下来我将尝试以线性回归作为切入点，进到这个黑盒子里头看看，为啥选择线性回归呢，因为他简单而且有代表性
+接下来的内容会有些数学，涉及到一些微积分和线性代数的基本知识，大家应该都学过，但有些可能已经忘了，有问题随时打断
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+
+### 预测房价
+<img src="/public/fig/mr_15.png" width="650" height="480">
+
+]
+???
+以我们要去预测加州的房价问题为例，我们手上已有一堆加州的房屋销售数据，每个样本都有房屋的
+位置、大小、房间数、离海岸距离、离商圈距离等等一系列信息，称之为特征、当然还有这个样本的房屋
+成交价格信息。我们这个样本集里假设有m条这样的数据
+
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+
+<img src="/public/fig/mr_16.png" width="600" height="380">
+
+$$\hat{y} = h_{\theta} (\textbf{x}) = \theta^{T} \cdot \textbf{x}$$
+
+
+]
+???
+我们假设房屋的各个特征和房屋的最终价格之间存在这样的一个简单的线性关系，一般来说房子越大，价格越高
+所以这样的假设不大过分吧
+其中。。。
+
+有个更简洁的向量点乘形式，其中theta被称之为模型的参数向量，包含截距相theta0和theta1-n
+
+theta T 是参数向量的转置，x 被称之为样本的特征向量
+
+theta T dot x 是这两个向量的点乘
+
+h theta (x)被称之为模型的假设函数，这个函数使用参数theta就表达了这个模型
+
+OK 模型已定，参数未知，接下来就是怎么训练数据来得到参数向量theta。
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+
+
+$$J(\theta) = \textbf{MSE} = \frac{1}{m} \sum_{i=1}^{m} (\theta^{T}\cdot\textbf{x}^i - y^i)^2$$
+
+<img src="/public/fig/mr_17.png" width="650" height="520">
+
+]
+???
+怎么训练呢，思想就是定义一个代价函数，表达模型拟合整个样本集的程度，拟合的越好，代价函数值越趋于0
+
+MSE: Mean square Error 均方误差就是这样的一个代价函数，思想非常简单，以单变量线性回归为例
+
+theta T dot xi 是对样本x 的预测值， yi是样本的真实值，两者之差的平方 再对整个样本集中样本的误差平方求和 除以样本个数就是
+所谓的均方误差
+
+训练过程就是去求得参数向量theta，去最小化这个代价函数MSE。
+
+也正是这个原因，线性回归又叫做最小二乘法
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+
+### Minimise   \\(J(\theta)\\)
+
+$$\frac{\partial J(\theta)}{\partial \theta_{0}} = 0$$
+
+$$\frac{\partial J(\theta)}{\partial \theta_{1}} = 0$$
+
+$$ ... $$
+
+$$\frac{\partial J(\theta)}{\partial \theta_{n}} = 0$$
+
+
+### Normal Equation
+
+$$ \hat{\theta} = (\textbf{X}^T \cdot \textbf{X})^{-1} \cdot \textbf{X}^T \cdot \textbf{y}$$
+
+]
+???
+怎么最小化代价函数呢？按照高数中的做法对一个凸函数求极值，最通用的方法就是对各个未知参数求偏导
+另其等于0，得到一个方程组。经过一系列的数学推导可以得到这个方程组的关于theta的一个解析解
+
+这个解就是著名的Normal Equation。其中X是所有样本以行向量形式组合成矩阵，m行n列，y是所有样本值构成的向量
+
+Normal equation高数推导比较繁琐，如果已线代视角看这个问题有个非常简洁的推导过程，有兴趣的同学找本线性代数书了解下
+
+OK 有了模型参数向量 theta后，用模型来做预测就非常简单了，把样本的特征向量带入这个式子做下点乘就得到了对应样本的预测值
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+### Normal Equation
+
+$$ \hat{\theta} = (\textbf{X}^T \cdot \textbf{X})^{-1} \cdot \textbf{X}^T \cdot \textbf{y}$$
+
+
+\\(\textbf{X}\\) : m 行 n 列
+
+\\(\textbf{X}^T \cdot \textbf{X}\\) : \\(O(m * n)\\)
+
+\\(\textbf{X}^T \cdot \textbf{X}\\) :  n 行 n 列
+
+\\((\textbf{X}^T \cdot \textbf{X})^{-1}\\): \\(O(n^{2.4})\\) ~ \\(O(n^3)\\)
+
+时间复杂度： \\(O(m * n) + O(n^3) \\)
+
+]
+???
+使用normal equation来训练有个问题就是计算复杂度，下面简单分析下
+...
+对于一个有很多特征的样本集而言，normal equation的计算压力就很大了。
+
+
+下面给出一种更为广泛、而且通用的迭代式的最优化算法，大名鼎鼎的Gradiend descent——梯度下降
+
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+### Gradiend descent
+
+<img src="/public/fig/mr_18.png" width="650" height="520">
+
+]
+???
+梯度下降的思想也很直观，就是开局时先随机猜测一个初始解，然后逐步优化这个解，每次朝一个方向前进一个小的步长
+使得代价函数（MSE）能减小一点，直到达到最小值。那么每次前进时朝哪个方向才能使得代价函数减少的最快呢？答案就是梯度方向
+
+以我们外出旅游时下山为例，想要最快下山肯定是选择最斜率陡峭的那条路，当然太陡峭也会比较危险，不建议这样
+换句话说这里我们已经在不自觉中应用梯度下降算法来下山了
+
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+  ### Gradiend descent
+]
+.right-column[
+### Learning rate
+
+.left[
+<img src="/public/fig/mr_19.png" width="420" height="300"> 
+]
+
+.right[
+<img src="/public/fig/mr_20.png" width="420" height="300">
+]
+
+]
+???
+关于梯度下降，有个很重要的超参数，就是learning rate，也就是每次前进的步长
+如果学习率太小会发生什么情况? take a long time
+过大呢？可能压根就不会收敛到优化解
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+### Gradiend descent
+
+<img src="/public/fig/mr_21.png" width="650" height="520">
+
+]
+???
+关于GD，还有一点需要了解的不是并不是所有函数，都能通过GD收敛到全局最优点，比如这样形状
+的函数，如果从这里开始应用GD，最终只能收敛到这个局部最优点。数学上只有凸函数才一定能通过GD收敛到全局最优，
+所幸的是我们接触到的大部分代价函数都是凸函数。
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+### Gradiend descent
+
+```java
+guess a initial value for θ (θ0,θ1)
+repeat until convergence {
+   θj := θj − α * ∂J(θ0,θ1) / ∂θj
+}
+```
+
+### Gradiend descent for Linear Regression
+
+$$J(\theta) = \frac{1}{m} \sum_{i=1}^{m} (\theta^{T}\cdot\textbf{x}^i - y^i)^2$$
+
+$$\frac{\partial J(\theta)}{\partial \theta_j} =  \frac{1}{m} \sum \frac{\partial}{\partial \theta_j} \frac{1}{2} (h(x) - y)^2$$
+
+$$\frac{\partial J(\theta)}{\partial \theta_j} =  \frac{1}{m} \sum (h(x) - y) \frac{\partial}{\partial \theta_j} (\theta^{T}\cdot\textbf{x}^i - y)$$
+
+$$\frac{\partial J(\theta)}{\partial \theta_j} =  \frac{1}{m}\sum (h(x) - y) x_j$$
+
+<!--= \frac{\partial}{\partial \theta_j} \frac{1}{2} \sum (h_{\theta}(x) - y)^2-->
+]
+???
+这里以两个参数给出GD最优化算法的伪代码，很简洁，首对theta0 theta1猜测一个初始解
+然后不断地向梯度相反反向去改进这个解，直至收敛
+其中a 就是学习率
+
+那么对于线下回归问题，代价函数我们已经确定是这个，应用梯度下降需要推导下代价函数的梯度
+...
+最后代入上面就得到了一个针对线性回归的GD最优化算法，可以看出每计算一个偏导，我们就需要遍历一次样本集
+
+因此这个算法又被称为 batch Gradiend descent
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+### batch Gradiend Descent 
+
+  - 迭代一次需要遍历整个样本集一遍
+
+  - 迭代一次时间复杂度： \\(O(m * n)\\)
+
+### stochastic Gradiend Descent  &  Mini-batch Gradiend descent
+
+<img src="/public/fig/mr_22.png" width="500" height="350">
+
+]
+???
+如果样本有n个特征，那么迭代一次的时间复杂度就是O(m * n) ，代价是比较高的, 一般迭代个十几次几十次都基本收敛了
+
+随机梯度下降则走的另外一个极端，每次迭代只从样本集随机选择一个样本来对模型参数进行更新
+相对比于批量梯度下降而言，他所需的内存开销很小，因为不需要把样本集数据全部load到内存，
+但是，由于他随机的特性，当他在参数空间搜索最优解时的走位也会比较飘忽不定，意味并不是每次
+迭代都能够减小代价函数，但经过多次迭代的最终会趋于收敛
+
+小批量梯度下降则是两者的中和，不多讲了。
+这里有张三者在参数空间搜索最优解时走位的路径，可以看出批量梯度下降的路径很平稳，随机梯度下降路径最为
+轻浮，小批量梯度下降则位于两者之间
+
+
+
+
+---
+
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+
+### 多项式回归
+
+\\(y = \theta_1 x + \theta_0\\)  ===>   \\(y = \theta_1 x^2 + \theta_2 x + \theta_0\\)
+
+.left[
+<img src="/public/fig/mr_24.png" width="420" height="300"> 
+]
+
+.right[
+<img src="/public/fig/mr_25.png" width="420" height="300">
+]
+
+]
+???
+前面我在介绍预测房价例子时做了一个特征和（要预测的值）label间线性关系的假设，但现实世界中
+更多的是更复杂的非线性关系。
+
+比如图中这个数据集，x和y之间的关系明显是一个二次的非线性关系
+
+体现到模型的假设中就是这个，这里可以将x^2看做是一个新的变量，这样只是给模型增加了一个参数，本质上还是线性回归
+
+从数学上来说，多项式可以拟合任意形状的函数，只要多项式次数足够高。
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+### Underfit  vs  Overfit
+
+### Bias vs Variance
+
+<img src="/public/fig/mr_27.png" width="650" height="250">
+
+]
+???
+比如在这个例子中，左边使用一次多项式也就是一条直线去拟合数据，得到的模型被称之为高偏差
+说白了就是没有拟合好。（欠拟合）
+
+中间的这个采用二次多项式在拟合，得到模型好很多，也符合数据的分布规律
+
+右边的这个采用一个很高的高次多项式去拟合，结果在训练样本集上看上太过于拟合，这种现象
+就叫过拟合。通常而言这样得到的模型在训练样本集上表现的很好，均方误差基本接近0，但是拿到
+真实环境去做应用时效果往往不好，因为模型复杂度高，太容易受训练样本集中噪声数据的影响。
+这样的模型被称之为过拟合、高偏差模型
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+### train set 
+### validate set
+
+<img src="/public/fig/mr_28.png" width="500" height="400">
+
+]
+???
+那么怎么识别我们训练出的模型到底是欠拟合还是过拟合还是适当拟合呢?
+如果我们把所有的样本都拿去做训练，用了一个高次多项式来拟合，得到的结果看起来很好、均方误差
+很小，让我误以为得到了一个不错的结果，这样肯定是不行的
+
+至少我们需要将样本集一份为二，一部分用于训练，一部分用于测试验证，这个比例一般是在8:2 9:1
+
+然后我们分别计算模型在训练集和验证集上的表现，会有这么几种情况：
+首先，当模型比较简单，比如线性模型，训练集和测试集上代价函数的值都很大，说明没拟合好——欠拟合、高偏差
+
+然后，模型非常复杂，比如高次多项式模型，训练集上表现很好，代价接近0了，但是测试集上很糟糕——过拟合、高方差
+
+中间这个刚好，训练集和测试集上代价函数值很接近，由于样本中噪声的存在导致这个值肯定会大于0
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+]
+.right-column[
+### 模型正则化
+
+$$J(\theta) = MSE(\theta) + \alpha \frac{1}{2} \sum_{i=1}^{n} \theta^2_i$$
+
+<img src="/public/fig/mr_29.png" width="650" height="350">
+
+]
+???
+当我们使用非线性模型去拟合样本数据时，为了防止过拟合，通常会引入模型的正则化
+其思想也比较直观，就是在代价函数中增加一个表达模型复杂度的正则化项，作为对模型复杂度的惩罚项
+
+最小化这个新的代价函数使得模型能够在拟合样本数据 和 模型复杂度之间tradeoff
+
+其中alpha又被称之为正则化参数，是带正则化线性回归的超参之一
+
+
+---
+class: center, middle, inverse
+
+# how to apply  machine learning to end-to-end project?
+???
+上面说了一大堆偏理论性的东西，接下来谈谈实际工程中怎么应用机器学习
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+  ## Practice
+]
+.right-column[
+
+### 指导方针
+
+  - 观察大局
+  - 获取数据
+  - 仔细研究、分析数据来得到洞见
+  - 准备数据（包括数据清洗、预处理、特征工程）
+  - 选择多个模型训练
+  - 对一两个效果不错的模型做深入的调参
+  - 模型上线、系统监控、持续维护
+]
+???
+这里给出应用机器学习解决问题的大致指导步骤，
+首先第一步，要从业务场景的大局入手，搞清楚要解决什么问题、优化目标是什么、结果应用在哪、现在解决方案是怎么样的
+在搞清楚这些问题之后，我们基本上就能回答机器学习任务的类型（有监督还是无监督、分类还是回归）、已经改应用哪些算法和模型来解决
+
+第二步非常关键 就是获取数据，数据是机器学习问题的核心，数据质量很大程度上决定这最终模型的好坏，对于有监督学习而言，
+这步需要将样本标记，对于分类问题标记上正负，回归问题标记出样本的目标值
+
+第三步 也很重要，就是结合业务领域知识研究、分析获取到的数据 尝试能找出一些规律、得到一些洞见
+
+第四步 也是最为耗费工作量的一步，就是准备数据、包括。。。这里不一一展开了
+
+然后才是，划分样本集、选择多个模型在训练样本集训练、在测试集上样本集上验证
+
+得到几个好不错、有前景的模型之后对这几个模型做进入的玄学调参，调参也是一个很大的话题，也有一些套路这里就不展开了
+
+最终把效果达到预期后上线模型、完善系统的监控、并持续优化和维护
+
+
+可以看出来，模型和算法本身占得比重并不多，而且都是成熟的轮子，主要工作则是数据处理、特征工程相关
+
+
+---
+.left-column[
+  ## Introduction
+  ## Linear Regression
+  ## Practice
+  ## Reference
+]
+.right-column[
+
+### 参考文献
+
+  - Aurélien Géron. 《Hands-On Machine Learning with Scikit-Learn and TensorFlow: Concepts, Tools, and Techniques to Build Intelligent Systems》
+
+  - Andrew Ng. https://www.coursera.org/learn/machine-learning/home/
+
+  - 李航. 《统计学习方法》
+
+]
+
+
+---
+class: center, middle, inverse
+
+# Concluding
+
+???
+今天由于时间关系，就不给大家演示具体的实战部分了，下次分享再结合一个具体的例子来实操下
+简单总结下今天的内容。
+首先，我们大致介绍了下机器学习系统的定义和分类，以及都解决什么问题，有哪些算法和模型
+
+然后，以线性回归为切入点，进入模型黑盒内部，介绍了线性回归模型表达、代价函数、normal equation
+、各种梯度下降最优化算法、多项式回归、欠拟合过拟合、模型正则化等内容
+
+最后，给出一个实际工程应用中使用机器学习解决问题的大致步骤
+
+希望大家有所收获、谢谢
