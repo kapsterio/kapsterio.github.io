@@ -13,6 +13,8 @@ tags: []
 
 如果你还没有看过LoadingCache的源码，建议先对着代码通读一篇。
 
+<!--more-->
+
 ## Guava LoadingCache功能介绍
 
 LoadingCache是Guava库中最常用的核心功能之一，其定位是作为一个支持多线程并发读写、高性能、通用的in-heap本地缓存。在使用上LoadingCache通过builder模式提供描述式api定制LoadingCache的功能以满足给定场景的需求。其主要功能有：
