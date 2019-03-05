@@ -165,11 +165,11 @@ LoadingCache的实现细节非常多，主要代码位于LocalCache类中，接�
 
 假设原hash表链表结构如下图所示，其中3是待删除节点：
 
-[before](/public/fig/before.png)
+![before](/public/fig/before.png)
 
 执行删除算法后，新的链表结构见下图：
 
-[after](/public/fig/after.png)
+![after](/public/fig/after.png)
 
 
 ### hash表扩容
