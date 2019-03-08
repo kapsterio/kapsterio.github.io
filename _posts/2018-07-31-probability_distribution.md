@@ -168,6 +168,8 @@ F(x;λ)=\left\{
 期望是 \\(1/λ\\)，方差是 $$1/λ^2$$，λ是单位时间间隔内事件发生的次数
 
 
+直觉上理解，泊松分布和指数分布的随机变量有点类似倒数的关系，简易推导见：[Understanding Waiting Times Between Events with the Poisson and Exponential Distributions](https://nbviewer.jupyter.org/github/nicolewhite/notebooks/blob/master/Poisson.ipynb)
+
 ## user-generated traffic生成
 有了这些背景知识，考虑下面这个问题：如果模拟给定的qps的user-generated traffic？
 
