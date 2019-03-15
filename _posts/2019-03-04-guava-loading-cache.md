@@ -245,7 +245,7 @@ hash表扩容时读写并发控制处理的思路也是copyOnWrite，具体代�
       this.count = newCount;
     }
 ```
-值得一提的是在rehash过程中LoadingCache做了一个很有意思的优化，见代码注释中的那段描述。由于采用的2的整数幂expansion，一个节点在rehash后在新表中的分桶index要么和旧表中的分桶index相同，要么相差个2的整数幂，而且很大概率是相同的分桶index（这点很容易验证，大概有5/6节点分桶index不变），因此原hash表中的某个桶内的冲突链表上可能大部分节点都不需要copy。
+值得一提的是在rehash过程中LoadingCache做了一个很有意思的优化，见代码注释中的那段描述。由于采用的2的整数幂expansion，一个节点在rehash后在新表中的分桶index要么和旧表中的分桶index相同，要么相差个2的整数幂，统计上来说，大约有5/6的节点的next指针是没有改变的，因此原hash表中的某个桶内的冲突链表上可能大部分节点都不需要copy。
 
 ## 总结
 受限于篇幅，LoadingCache里还有很多值得学习的设计和实现技巧，比如构建cache的builder模式api、ReferenceEntry的抽象，这里就不一一详细分析了，有兴趣的同学可以自行挖掘。
