@@ -15,6 +15,8 @@ h2 server是基于TLS的ALPN的扩展来start http2的，因此需要先为pipel
 
 netty里已经提供好一个`ApplicationProtocolNegotiationHandler`基类，通过实现其`configurePipeline`方法来根据ALPN扩展里的protocol来配置相应的pipeline
 
+<!--more-->
+
 ```
     @Override
     protected void configurePipeline(ChannelHandlerContext ctx, String protocol) throws Exception {

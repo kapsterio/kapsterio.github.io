@@ -34,6 +34,9 @@ tags: []
 ```
 可以看出还是熟悉的味道，基于ALPN扩展协商，然后将connectionHandler也就是Http2ConnectionHandler加入pipeline中。
 
+
+<!--more-->
+
 ## 配置h2c client pipeline
 
 ```
