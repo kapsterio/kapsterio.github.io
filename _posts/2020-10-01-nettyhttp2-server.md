@@ -175,12 +175,14 @@ private void configureClearText(SocketChannel ch) {
 
 
 - h2
+
 ```
 ctx.pipeline().addLast(Http2FrameCodecBuilder.forServer().build(), new HelloWorldHttp2Handler());
 
 ```
 
 - h2c
+
 ```
     final ChannelPipeline p = ch.pipeline();
     final HttpServerCodec sourceCodec = new HttpServerCodec();
