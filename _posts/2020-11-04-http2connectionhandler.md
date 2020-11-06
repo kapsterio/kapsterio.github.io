@@ -6,7 +6,7 @@ category:
 tags: []
 ---
 
-# OverView
+# Overview
 
 ## Http2ConnectionHandler
 
@@ -84,3 +84,120 @@ Http2Connection内部定义的Listener接口是为了能够接受connection上st
 ![interface](../draw.io/http2ConnectionHandler.svg)
 
 
+# Inbound数据处理
+
+## Overview
+
+```plantumlcode
+@startuml
+
+-> Http2ConnectionHandler: decode(...)
+
+Http2ConnectionHandler -> DefaultHttp2ConnectionDecoder : decodeFrame(...)
+
+DefaultHttp2ConnectionDecoder -> DefaultHttp2FrameReader : readFrame(...)
+
+DefaultHttp2ConnectionDecoder --> FrameReadListener : onXXXRead(...)
+
+FrameReadListener -> FrameReadListener : ...
+
+participant "Http2FrameListener" as listener #99FF99
+
+FrameReadListener -> listener: onXXXRead(...) (callback the application)
+
+listener -> FrameReadListener: return
+
+FrameReadListener -> FrameReadListener : ...
+
+@enduml
+```
+
+
+`FrameReadListener` 也是一个`Http2FrameListener`， 他负责处理协议控制相关的逻辑（流量控制、stream状态切换、流优先级控制等等），另外负责调用应用层的listener执行应用程序的回调。
+
+
+下面分http2协议帧类型，解读下`FrameReadListener`的实现。
+
+
+## onDataRead
+```plantumlcode
+@startuml
+
+-> FrameReadListener: onDataRead(...)
+
+FrameReadListener -> DefaultHttp2LocalFlowController : receiveFlowControlledFrame(...)
+
+
+participant "FlowState (connectionState)" as connectionState
+
+participant "FlowState (streamState)" as streamState
+
+DefaultHttp2LocalFlowController -> connectionState : receiveFlowControlledFrame (connection-level)
+
+connectionState -> connectionState: decrease the window
+
+DefaultHttp2LocalFlowController -> streamState : receiveFlowControlledFrame (stream-level flow controll)
+
+streamState -> streamState: decrease the window
+
+participant "Http2FrameListener" as listener #99FF99
+
+
+FrameReadListener -> listener: onDataRead(...) (callback the application)
+
+listener -> FrameReadListener: bytesToReturn (retrieve the number of bytes that have been processed)
+
+
+FrameReadListener -> DefaultHttp2LocalFlowController: consumeBytes(bytesToReturn, ...)
+
+
+DefaultHttp2LocalFlowController -> connectionState: consumeBytes(...)
+
+connectionState -> connectionState: decrease processedWindow
+
+alt processedWindow <= 1/2 * initialWindow case
+
+    connectionState -> connectionState: expand window back to intial window
+
+    connectionState -> Http2FrameWriter : writeWindowUpdate(...) 
+end
+
+DefaultHttp2LocalFlowController -> streamState: consumeBytes(...)
+
+streamState -> streamState: decrease processedWindow
+
+alt processedWindow <= 1/2 * initialWindow case
+
+    streamState -> streamState: expand window back to intial window
+
+    streamState -> Http2FrameWriter : writeWindowUpdate(...) 
+end
+
+@enduml
+
+```
+
+DATA帧是需要收flow controll的，因此onDataRead里涉及到`DefaultHttp2LocalFlowController`来进行流控处理。上图是一个收到一个DATA帧后的正常情况处理流程。
+
+### DefaultHttp2LocalFlowController
+
+
+作为http2接口端流控的基本实现，算法思想很简单： 就是在window 小于 windowUpdateRatio * initialWindow时发送WINDOW_UPDATE帧来告诉发送方扩大窗口继续发送。 
+
+实现上主要维护两个值： window和processedWindow
+- window: 实际的接受窗口大小，一旦收到data，就会去从window上减去对应大小
+- processedWindow: window的视图，用于决定是否发送window_update，收到data后不会立即减少，而是在应用层的onDataRead返回已处理数据大小后，再去减小（减掉应用层onDataRead返回的值）
+
+
+
+## onHeadersRead
+
+
+```plantumlcode
+@startuml
+
+-> FrameReadListener: onHeadersRead(...)
+
+
+@enduml
+```
