@@ -145,7 +145,7 @@ Http2ServerUpgradeCodec的初始化方法里最重要的是传入一个Http2Conn
 
 
 ## 配置h2c server (client知道server是http2)
-有些client可能有server 提供http2服务这一先验知识，因此他们可以直接和server进行http2通信，省去了HTTP1 upgrade这一交互过程。按照协议双方直接开始交互CONNECTION PREFACE (一串特殊字符串后跟着Http2Settings帧)，因此再server可以根据连接上的开始字节是否是CONNECTION PREFACE来配置pipeline，这一点netty提供了
+有些client可能知道server 提供http2服务这一先验知识，因此他们可以直接和server进行http2通信，省去了HTTP1 upgrade这一交互过程。按照协议双方直接开始交互CONNECTION PREFACE (一串特殊字符串后跟着Http2Settings帧)，因此再server可以根据连接上的开始字节是否是CONNECTION PREFACE来配置pipeline，这一点netty提供了
 CleartextHttp2ServerUpgradeHandler，封装了这一个过程。
 
 ```
