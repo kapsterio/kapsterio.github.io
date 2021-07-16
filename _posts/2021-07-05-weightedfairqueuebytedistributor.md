@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "nettt WeightedFairQueueByteDistributor算法和实现"
+title: "netty WeightedFairQueueByteDistributor算法和实现"
 description: ""
 category: 
 tags: []
@@ -19,6 +19,9 @@ http2中stream会依赖父stream，父stream优先于子stream发送数据，当
 有个前提：分配数据量有个最小单元，也称为chunk，这个前提也很容易理解，这个chunk大小的选择要做到效率和公平间平衡，选择的太小的话，效率低，太大的话，不公平。
 
 在前面的UniformStreamByteDistributor中，chunkSize是根据当前最大可写的数据量maxBytes 除以当前active stream数动态计算得到。在这里chunk大小的选择将是影响算法表现的一个重要因素。
+
+
+<!--more-->
 
 ## 基本思想
 
