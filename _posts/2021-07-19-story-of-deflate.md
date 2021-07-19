@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "story of Deflate"
+title: "Story Of Deflate"
 description: ""
 category: 
 tags: []
