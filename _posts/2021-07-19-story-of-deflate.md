@@ -11,6 +11,8 @@ tags: []
 在无损压缩算法中Deflate基本上互联网时代无损压缩算法的事实标准，我们日常生活常用的zip、gzip等工具、http协议中对body部分的常见压缩算法都是使用的deflate。Deflate算法最早是由[Phil Katz](https://zh.wikipedia.org/wiki/%E8%8F%B2%E5%B0%94%C2%B7%E5%8D%A1%E8%8C%A8)在编写PKZIP(也就是后来被广泛使用的ZIP)时提出，后来在众多自由软件先驱的努力下被众多广泛实现和应用，再被IETF标准化，形成[Deflate压缩标准](https://datatracker.ietf.org/doc/html/rfc1951)。Deflate算法本身也是在前人工作的基础上创新得到，主要基于[LZ77算法](https://en.wikipedia.org/wiki/LZ77_and_LZ78)和大名鼎鼎的[Huffman coding算法](https://en.wikipedia.org/wiki/Huffman_coding)，Zlib的作者在[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)里对Deflate的工作原理做了很好的解释。接下来的主要内容也将会是结合Deflate原理，整理、学习和分析Deflate的一些design choices。不过进入正题之前，先来理清下这些常见名词到底是什么，我觉得应该有很多人和我一样被中文互联网上deflate、zlib、zip、gzip、tar的这些名词的混用而搞的晕乎乎的。
 
 
+<!--more-->
+
 ### Deflate
 Deflate前面提到了，是源自于DOS上PKZIP这个工具的无损压缩算法，后来在进入互联网时代后被IETF标准化了。我们知道算法和数据结构是密不可分的，IETF对Deflate的标准化不仅将其压缩策略标准化了（比如怎么LZ77以及huffman coding、选择什么样的huffman树），同时还对压缩数据的格式做了标准化。因此Deflate在当下的语义下不仅代表一种压缩算法、还是一种压缩文件的数据格式。如今Deflate标准已经是众多压缩软件/工具的基石。
 
@@ -50,7 +52,15 @@ OK，最容易产生迷糊的地方来了，就是在HTTP1.1协议里面的[cont
 >
 >  The default (identity) encoding; the use of no transformation whatsoever. This content-coding is used only in the Accept-Encoding header, and SHOULD NOT be used in the Content-Encoding header.
 
-看到没，http1.1定义中“gzip”指的是RFC 1952中的gzip data format，而"deflate"则指是RFC 1950中的zlib data format。问题就出在这，有些粗心的http1.1实现将其误认为是RFC 1951中定义的raw deflate data format，其中最臭名昭著的就是田厂。因此即便是"deflate"相比于"gzip"更加轻量化和高效，大部分client和server选择"gzip"作为内容压缩格式，至少所有浏览器都能正确对待它。在zlib官网的faq中作者解释了[为什么"gzip"在http1.1里用的更多](https://zlib.net/zlib_faq.html#faq39)
+看到没，http1.1定义中“gzip”指的是RFC 1952中的gzip data format，而"deflate"则指是RFC 1950中的zlib data format。问题就出在这，有些粗心的http1.1实现将其误认为是RFC 1951中定义的raw deflate data format，其中最臭名昭著的就是田厂。因此即便是"deflate"相比于"gzip"更加轻量化和高效，大部分client和server选择"gzip"作为内容压缩格式，至少所有浏览器都能正确对待它。在zlib官网的faq中作者解释了为什么"gzip"在http1.1里用的更多。
+
+> What's the difference between the "gzip" and "deflate" HTTP 1.1 encodings?
+> 
+> "gzip" is the gzip format, and "deflate" is the zlib format. They should probably have called the second one "zlib" instead to avoid confusion with the raw deflate compressed data format. While the HTTP 1.1 RFC 2616 correctly points to the zlib specification in RFC 1950 for the "deflate" transfer encoding, there have been reports of servers and browsers that incorrectly produce or expect raw deflate data per the deflate specification in RFC 1951, most notably Microsoft. So even though the "deflate" transfer encoding using the zlib format would be the more efficient approach (and in fact exactly what the zlib format was designed for), using the "gzip" transfer encoding is probably more reliable due to an unfortunate choice of name on the part of the HTTP 1.1 authors.
+>
+> Bottom line: use the gzip format for HTTP 1.1 encoding.
+
+
 
 
 
