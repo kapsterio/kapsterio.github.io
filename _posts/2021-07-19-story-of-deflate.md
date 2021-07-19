@@ -8,7 +8,7 @@ tags: []
 
 ## Deflate算法以及ZIP、GZIP、ZLIB
 
-在无损压缩算法中Deflate基本上互联网时代无损压缩算法的事实标准，我们日常生活常用的zip、gzip等工具、http协议中对body部分的常见压缩算法都是使用的deflate。Deflate算法最早是由[Phil Katz](https://zh.wikipedia.org/wiki/%E8%8F%B2%E5%B0%94%C2%B7%E5%8D%A1%E8%8C%A8)在编写PKZIP(也就是后来被广泛使用的ZIP)时提出，后来在众多自由软件先驱的努力下被众多广泛实现和应用，再被IETF标准化，形成[Deflate压缩标准](https://datatracker.ietf.org/doc/html/rfc1951)。Deflate算法本身也是在前人工作的基础上创新得到，主要基于[LZ77算法](https://en.wikipedia.org/wiki/LZ77_and_LZ78)和大名鼎鼎的[Huffman coding算法](https://en.wikipedia.org/wiki/Huffman_coding)，Zlib的作者在[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)里对Deflate的工作原理做了很好的解释。接下来的主要内容也将会是结合Deflate原理，整理、学习和分析Deflate的一些design choices。不过进入正题之前，先来理清下这些常见名词到底是什么，我觉得应该有很多人和我一样被中文互联网上deflate、zlib、zip、gzip、tar的这些名词的混用而搞的晕乎乎的。
+在无损压缩算法中，Deflate基本是上互联网时代无损压缩算法的事实标准，我们日常生活常用的zip、gzip等工具、http协议中对body部分的常见压缩算法都是使用的Deflate。Deflate算法最早是由[Phil Katz](https://zh.wikipedia.org/wiki/%E8%8F%B2%E5%B0%94%C2%B7%E5%8D%A1%E8%8C%A8)在编写PKZIP(也就是后来被广泛使用的ZIP)时提出，后来在众多自由软件先驱的努力下被众多广泛实现和应用，再被IETF标准化，形成[Deflate压缩标准](https://datatracker.ietf.org/doc/html/rfc1951)。Deflate算法本身也是在前人工作的基础上创新得到，主要基于[LZ77算法](https://en.wikipedia.org/wiki/LZ77_and_LZ78)和大名鼎鼎的[Huffman coding算法](https://en.wikipedia.org/wiki/Huffman_coding)，Zlib的作者在[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)里对Deflate的工作原理做了很好的解释。接下来的主要内容也将会是结合Deflate原理，整理、学习和分析Deflate的一些design choices。不过进入正题之前，先来理清下这些常见名词到底是什么，我觉得应该有很多人和我一样被中文互联网上deflate、zlib、zip、gzip、tar的这些名词的混用而搞的晕乎乎的。
 
 
 <!--more-->
