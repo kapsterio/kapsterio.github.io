@@ -5,15 +5,15 @@ description: ""
 category: 
 tags: []
 ---
-# Overview
+## Overview
 
 这篇blog将具体介绍netty中对http2协议中stream dependency部分的实现，分为两部分，第一部分先介绍下netty http2所参考的[HTTP/2 priority implementation in nghttp2
 ](https://docs.google.com/presentation/d/1x3kWQncccrIL8OQmU1ERTJeq7F3rPwomqJ_wzcChvy8/edit#slide=id.p)采用的算法，第二部分分析下netty http2中WeightedFairQueueByteDistributor的算法和具体实现。
 
 
-# HTTP/2 priority implementation in nghttp2
+## HTTP/2 priority implementation in nghttp2
 
-## 问题是什么
+### 问题是什么
 http2中stream会依赖父stream，父stream优先于子stream发送数据，当父stream不能proceed时候，父stream的分配资源被所有子stream按照所占的权重来共享分配。所有stream形成一颗自顶向下的依赖树，树的根结点是stream 0，算法要解决的问题是将本轮可以发送的数据量在这颗依赖树上所有active streams间进行分配。
 
 有个前提：分配数据量有个最小单元，也称为chunk，这个前提也很容易理解，这个chunk大小的选择要做到效率和公平间平衡，选择的太小的话，效率低，太大的话，不公平。
@@ -23,7 +23,7 @@ http2中stream会依赖父stream，父stream优先于子stream发送数据，当
 
 <!--more-->
 
-## 基本思想
+### 基本思想
 
 ![flat case](/public/fig/basic.png)
 
@@ -38,9 +38,9 @@ http2中stream会依赖父stream，父stream优先于子stream发送数据，当
 
 
 
-## 实现思路
+### 实现思路
 
-### 数据结构 —— prority queue per stream
+#### 数据结构 —— prority queue per stream
 
 算法为每个stream维护一个优先级队列来维护当前stream的active的子stream的调度优先级（注意：如果一个stream自己不是active，但是以他为根的子树中存在active的stream，那么这个stream也会在其父stream的优先级队列里）。这里的调度优先级就是实现意义上的调度优先级，当前优先级高的将被优先调度，和http2的priority无关。具体实现上通过定义一个pseduo time来表征优先级，值越小标识优先级越高。 
 
@@ -93,11 +93,11 @@ schedule(0)
 
 需要注意的是这个算法里说的`active` stream等价于stream有数据要发送，优先级队列里维护的stream也都是`active`的。
 
-# WeightedFairQueueByteDistributor实现
+## WeightedFairQueueByteDistributor实现
 
-## 数据结构
+### 数据结构
 
-### State 与 State树
+#### State 与 State树
 `Http2Stream` 接口里没有体现Stream间的依赖关系，依赖树结构关系、分配调度所需要的状态数据都被放到了WeightedFairQueueByteDistributor内部实现的State中，每个Http2Stream会对应一个State。State主要有以下属性
 - final int streamId: state所标识的stream id
 - Http2Stream stream: state所关联的Http2Stream对象，可能是null（标识这个stream还没有被创建或者已经销毁，不是active）
@@ -114,18 +114,18 @@ schedule(0)
 - byte flags: 一个字节的标记位
 
 
-### WeightedFairQueueByteDistributor实例的数据结构
+#### WeightedFairQueueByteDistributor实例的数据结构
 `WeightedFairQueueByteDistributor`实例本身是连接Connection维度的，他的数据结构也都是Connection维度的，主要有：
 - final IntObjectMap<State> stateOnlyMap: http2协议中允许在一个不存在的(idle/closed)stream上发送PRIORITY帧，也允许stream去depend on一个不存在的stream，同时http2还建议即便一个stream close后，还要继续保留stream的Prioritization State一段时间（以避免由于对子stream的重新Prioritization而可能导致的Prioritization信息损失）。基于以上情况，需要有个管理这些没有Http2Stream对象的State，stateOnlyMap就是这个作用，key是stream id, value是state对象。
 - final PriorityQueue<State> stateOnlyRemovalQueue: 这个queue的作用是按照自定义的优先级来维护这些没有关联Http2Stream的state。
 - State connectionState: state树的root
 
 
-### 对State树和non-active state map结构的维护
+#### 对State树和non-active state map结构的维护
 定义了数据结构之后，剩下的操作就比较不言自明了，主要是对state树进行非常old-school的树操作，这里抽了几个方法，简单介绍下实现和调用时机。
 
 
-#### onStreamAdded
+##### onStreamAdded
 这个回调发生在stream被创建的时候，那么stream创建具体有哪些时机？
 - 收到对端发的HEADER帧，此时stream处于open状态
 - 向对端发送HEADER帧, stream也是open状态
@@ -136,11 +136,11 @@ schedule(0)
 
 
 
-#### onStreamRemoved
+##### onStreamRemoved
 当stream/connection被close时，这个回调得到执行。此时需要的做的是，首先解除state和stream的关联，然后将state加入stateOnlyMap和stateOnlyRemovalQueue中，如果stateOnlyRemovalQueue的size超过最大限制了，需要将queue中优先级最低的出队，然后将这个出队的state从state树中删除，再从stateOnlyMap中删除。（从state树中删除会涉及到很多数据结构的变更，比如当前state的和其parent的父子关系、当前state的如果还有子的话，需要将所有子state加到parent的children集合中，还可能会加入到新的parent的pseudoTimeQueue中）
 
 
-#### updateDependencyTree
+##### updateDependencyTree
 
 ```
         if (newParent != state.parent || (exclusive && newParent.children.size() != 1)) {
@@ -158,7 +158,7 @@ schedule(0)
 核心逻辑是这段代码，实现了“如果变更一个stream的依赖去依赖自己的某个子stream，这个情况比较特殊，需要先把这个子stream改为依赖当前stream的之前的父stream，然后再变更当前stream的依赖” 这个操作。
 
 
-#### updateStreamableBytes
+##### updateStreamableBytes
 这个接口的作用之前说了，是用来告诉Distributor，StreamState标识的流的Streamable（可写的字节)发生变化了。调用的时机是有数据发送前和完成数据写出后。这里很重要的是当stream有数据可发送时，需要更新state树上从当前state开始一直到state树根路径上所有state节点的activeCountForTree，如果activeCountForTree为0了，说明当前state没有数据可发送了，需要从parent的pseudoTimeQueue中移除，如果activeCountForTree之前为0，更新后不为0了，需要将state加入parent的pseudoTimeQueue中。这里将stream有数据可发送(`state.hasFrame() && state.windowSize() >= 0`)定义为active stream，pseudoTimeQueue维护的也都是active stream. 这里也可以看出State中activeCountForTree这个字段重要性，通过这个字段的值决定是否需要从pseudoTimeQueue中移除/重新加入。state树结构有变更时候activeCountChangeForTree方法都需要执行，递归传播到state树根。另外还有个字段
 totalQueuedWeights基本上和pseudoTimeQueue维护的时机一致，因此totalQueuedWeights准确来说是state所有active 的直接子state的weight之和。
 
