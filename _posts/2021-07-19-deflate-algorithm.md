@@ -105,7 +105,7 @@ literal就是原始数据中的一个个字符（字节），所以一个literal
 细心的读者会发现，285这个length的bits是0，意味着285作为一个独立的段参与haffman coding中，为什么？我猜测是由于285作为Deflate规定的最大匹配串长度，也就说所有超过285的匹配字符串长度都被截断到285了，因此其出现的概率会相对高些。
 
 OK，这里暂停总结下目前为止Defate算法的编码过程：
-首先应用LZ77算法对原始数据进行压缩，生成(<length, distance> | literal)数据流，然后对数据流应用huffman coding算法进行统计分析，生成了两个haffman码表，一个是literal/length构成的alphabet所生成的码表（简称为码表1)，一个是distance值构成的alphabet所生成的码表（简称为码表2），再由这两个码表对(<length, distance> | literal)数据流进行编码得到最终的数据码流。
+首先应用LZ77算法对原始数据进行压缩，生成(<length, distance> | literal)数据流，然后对数据流应用huffman coding算法进行统计分析，生成了两个haffman码表，一个是literal/length构成的 alphabet 所生成的码表（简称为码表1)，一个是distance值构成的alphabet所生成的码表（简称为码表2），再由这两个码表对(<length, distance> | literal)数据流进行编码得到最终的数据码流。
 
 解码过程就是上面的逆过程，假设已经重建好码表1和码表2，首先应用码表1对数据流进行解码，如果发现是literal则直接输出，如果是length，继续用码表2对length后面的distance进行解码，得到<length, distance> pair，最终将生成的(<length, distance> | literal) 数据流交给LZ77解码得到原始数据。进度条到这里已经过半了，但是故事还没有结束，前面说过码表本身需要和压缩的数据流一起来传输/存储，下面继续Deflate算法对码表本身的处理。
 
@@ -113,6 +113,20 @@ OK，这里暂停总结下目前为止Defate算法的编码过程：
 #### 对huffman码表本身的encoding
 前面提到，Deflate选择构建一颗最特殊的huffman树（最左倾的树）来进行huffman编码，这样码表可以用字符以及其对应的code length来唯一表示，大大缩小了码表的数据量。以literal/length码表为例，整个alphabet大小是286（256个literal + 1个块结束标识 + 29个length段），因此整个码表可以用长度为286个code length序列来表示，每个code length唯一对应一个alphabet中的字符。Distance码表也一样，可以用一个长度为30的code length序列唯一表示。通常来说这两个code length序列越往后code length值为0的可能性就越大，0意味着alphabet中没有对应的元素（字符）。所以在这里Deflate用了一个小的trick，它将这两个code length序列trim一下，把trailing的那些0都去掉，然后把他们合并称一个code length序列。由于事先知道这两个序列的原始长度，根据经过trim再合并得到的这个code length完全能还原出原始的两个code length序列。
 
-可以看出这个序列中依旧会出现很多连续的0，或者1等等code length。
+可以看出这个序列中依旧会出现很多连续的0，或者1等等code length的存在。Deflate意识到这点，所以会先对这个code length序列做一次[run length encoding](https://zh.wikipedia.org/zh-tw/%E6%B8%B8%E7%A8%8B%E7%BC%96%E7%A0%81)，也就是游程编码。在构建huffman树的时候，Deflate其实还对生成树的高度加了限制，使得huffman树的高度不超过15，因此这个code length序列的取值范围是0-15。在经过游程编码后序列会进一步压缩成，姑且称这个经过游程编码后的序列为MCL，MCL的长度肯定小于(286 + 30)，MCL序列中元素的取值范围是0-18(游程编码会引入16、17、18)几个特殊字符。
 
-因此Deflate意识到这点，先对这个code length序列做一次[run length encoding](https://zh.wikipedia.org/zh-tw/%E6%B8%B8%E7%A8%8B%E7%BC%96%E7%A0%81)，也就是游程编码。
+Deflate对MCL再进行一次huffman coding，同时限制生成的haffman树高度最多为7，得到一个编码后MCL数据流，以及一个MCL huffman码表，对于这个MCL huffman码表，采用和前面一致的code length表示法，由于这个码表的alphabet大小只有19个，Deflate认为差不多就得了，用固定长度编码对RSQ码表的code lengths进行编码。值得说明的是，针对这个alphabet Deflate按照如下的顺序记录他们的code length：
+
+```
+16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
+```
+采用这个特殊顺序记录code length的原因是为了能让0 尽可能出现在code length序列的尾部（16,17,18是游程编码进入的特殊字符，所以出现的频率可能会高些，所以放前面）。这样以来可以对code length进行trim操作，去掉trailing的0，然后记录下原来code length序列长度（alphabet大小）解码的时候就能够正确恢复。
+
+
+#### put it all together
+
+总结下整个Deflate encoding的过程如下图所示：
+
+![deflate encoding](/public/fig/deflate_encoding.png)
+
+End of the story, 不得不感慨下Deflate这个三十多年前诞生、比我年龄都大的压缩算法至今仍然在互联网里扮演着不可或缺的角色，深入算法细节后又发现其实并没有应用什么数学魔法在里面，相对于图像、视频领域广泛应用的DCT变换、小波变换之类的压缩算法，Deflate和他们比起来有点类似于物理攻击和法术攻击的区别，Deflate之所以有着这么顽强的生命力，我觉得很大一部分归功于作者对数据和haffan coding深入分析和实践后得到的trick和经验，这种死扣细节、优化到极致的做法值得学习。
