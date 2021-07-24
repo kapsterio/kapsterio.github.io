@@ -70,7 +70,7 @@ next
 
 ### Deflate中LZ77和Haffman coding怎么结合起来
 
-总的来说，Deflate先应用LZ77压缩策略对原始数据进行压缩，得到<length, distance> | literal 流，然后应用haffman coding对 distance、length、literal分别进行编码得到最终的压缩数据流。
+总的来说，Deflate先应用LZ77压缩策略对原始数据进行压缩，得到(<length, distance> | literal) 流，然后应用haffman coding对 distance、length、literal分别进行编码得到最终的压缩数据流。
 
 应用LZ77的过程没啥好说的了，比较trick的是应用haffman coding的过程。
 
