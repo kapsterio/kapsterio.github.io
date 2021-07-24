@@ -46,7 +46,7 @@ end while
 
 decoding的伪代码：
 ```
-for each token (<length, distance>  | symbol) 
+for each token (<length, distance>  or symbol) 
     if token is symbol 
         then print symbol; 
     else 
@@ -70,7 +70,7 @@ next
 
 ### Deflate中LZ77和Haffman coding怎么结合起来
 
-总的来说，Deflate先应用LZ77压缩策略对原始数据进行压缩，得到(<length, distance> | literal) 流，然后应用haffman coding对 distance、length、literal分别进行编码得到最终的压缩数据流。
+总的来说，Deflate先应用LZ77压缩策略对原始数据进行压缩，得到(<length, distance> or literal) 流，然后应用haffman coding对 distance、length、literal分别进行编码得到最终的压缩数据流。
 
 应用LZ77的过程没啥好说的了，比较trick的是应用haffman coding的过程。
 
@@ -107,9 +107,9 @@ literal就是原始数据中的一个个字符（字节），所以一个literal
 细心的读者会发现，285这个length的bits是0，意味着285作为一个独立的段参与haffman coding中，为什么？我猜测是由于285作为Deflate规定的最大匹配串长度，也就说所有超过285的匹配字符串长度都被截断到285了，因此其出现的概率会相对高些。
 
 OK，这里暂停总结下目前为止Defate算法的编码过程：
-首先应用LZ77算法对原始数据进行压缩，生成(<length, distance> | literal)数据流，然后对数据流应用huffman coding算法进行统计分析，生成了两个haffman码表，一个是literal/length构成的 alphabet 所生成的码表（简称为码表1)，一个是distance值构成的alphabet所生成的码表（简称为码表2），再由这两个码表对(<length, distance> | literal)数据流进行编码得到最终的数据码流。
+首先应用LZ77算法对原始数据进行压缩，生成(<length, distance> or literal)数据流，然后对数据流应用huffman coding算法进行统计分析，生成了两个haffman码表，一个是literal/length构成的 alphabet 所生成的码表（简称为码表1)，一个是distance值构成的alphabet所生成的码表（简称为码表2），再由这两个码表对(<length, distance> or literal)数据流进行编码得到最终的数据码流。
 
-解码过程就是上面的逆过程，假设已经重建好码表1和码表2，首先应用码表1对数据流进行解码，如果发现是literal则直接输出，如果是length，继续用码表2对length后面的distance进行解码，得到<length, distance> pair，最终将生成的(<length, distance> | literal) 数据流交给LZ77解码得到原始数据。进度条到这里已经过半了，但是故事还没有结束，前面说过码表本身需要和压缩的数据流一起来传输/存储，下面继续Deflate算法对码表本身的处理。
+解码过程就是上面的逆过程，假设已经重建好码表1和码表2，首先应用码表1对数据流进行解码，如果发现是literal则直接输出，如果是length，继续用码表2对length后面的distance进行解码，得到<length, distance> pair，最终将生成的(<length, distance> or literal) 数据流交给LZ77解码得到原始数据。进度条到这里已经过半了，但是故事还没有结束，前面说过码表本身需要和压缩的数据流一起来传输/存储，下面继续Deflate算法对码表本身的处理。
 
 
 #### 对huffman码表本身的encoding
