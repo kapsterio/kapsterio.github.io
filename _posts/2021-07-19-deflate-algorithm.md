@@ -12,6 +12,8 @@ tags: []
 
 在学习Deflate时候，我先是找到了[RFC 1950](https://datatracker.ietf.org/doc/html/rfc1951)也就是Deflate压缩标准来啃，通读一篇发现还是对deflate的工作原理和细节还是模模糊糊，原因是RFC 1950里只有标准，不涉及解释，也就说只说了怎么做，没有解释为什么这么做。后来发现zlib的作者在[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)一文中对Deflate算法的原理和trouble points做了比较全面的解释，但是我第一次阅读这篇blog时对后半部分基本上没怎么看懂，原因是一方面我水平菜，另一方面我觉得是Antaeus Feldspar大神在这篇blog里省略了很多细节。在各种搜索了解这些缺失但是对理解算法很有必要的细节后，再读起来就比较顺畅了。这篇blog的内容就是扩充下[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)的内容，补齐其缺失的细节。
 
+<!--more-->
+
 ## 前置知识
 > It's important before trying to understand DEFLATE to understand the other two compression strategies that make it up -- Huffman coding and LZ77 compression.
 
