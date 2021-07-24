@@ -131,4 +131,11 @@ Deflate对MCL再进行一次huffman coding，同时限制生成的haffman树高�
 
 ![deflate encoding](/public/fig/deflate_encoding.png)
 
-End of the story, 不得不感慨下Deflate这个三十多年前诞生、比我年龄都大的压缩算法至今仍然在互联网里扮演着不可或缺的角色，深入算法细节后又发现其实并没有应用什么数学魔法在里面，相对于图像、视频领域广泛应用的DCT变换、小波变换之类的压缩算法，Deflate和他们比起来有点类似于物理攻击和法术攻击的区别，Deflate之所以有着这么顽强的生命力，我觉得很大一部分归功于作者对数据和haffan coding深入分析和实践后得到的trick和经验，这种死扣细节、优化到极致的做法值得学习。
+End of the story.
+
+再总结下Deflate中两个非常值得学习的点：
+- 将alphabet的取值空间划分成大小不等的段，对段进行haffman coding
+- 为了最小化haffman码表的数据量，用code lengths唯一表示一颗haffman树
+
+
+最后不得不感慨下Deflate这个三十多年前诞生、比我年龄都大的压缩算法至今仍然在互联网里扮演着不可或缺的角色，深入算法细节后又发现其实并没有应用什么数学魔法在里面，相对于图像、视频领域广泛应用的DCT变换、小波变换之类的压缩算法，Deflate和他们比起来有点类似于物理攻击和法术攻击的区别，Deflate之所以有着这么顽强的生命力，我觉得很大一部分归功于作者对数据和haffan coding深入分析和实践后得到的trick和经验，这种死扣细节、优化到极致的做法值得学习。
