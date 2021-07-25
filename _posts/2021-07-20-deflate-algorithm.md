@@ -7,10 +7,7 @@ tags: []
 ---
 
 ## 背景
-前一篇[blog](http://kapsterio.github.io/test/2021/07/19/story-of-deflate.html)中，为了弄清楚长久一来一直困惑我的deflate、zip、gzip、zlib这些关系，我在互联网的各个角落里翻阅了不少RFC和web pages，我觉得算是基本弄清楚它们之间来龙去脉和联系了，接下来进入正题，写写关于Deflate算法。我对这个算法的兴趣源自于之前在公司内部做的一个优化imo客户端和服务端通讯协议相关的工作，是的，我们代码在对通信协议数据使用的zlib对数据进行的压缩，在深入去了解deflate算法原理和zlib使用后，我对原来的代码做出了一些比较有效的优化。所以我觉得有必要去写一点Deflate算法的东西记录下。
-
-
-在学习Deflate时候，我先是找到了[RFC 1951](https://datatracker.ietf.org/doc/html/rfc1951)也就是Deflate压缩标准来啃，通读一篇发现还是对deflate的工作原理和细节还是模模糊糊，原因是RFC 1951里只有标准，不涉及解释，也就说只说了怎么做，没有解释为什么这么做。后来发现zlib的作者在[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)一文中对Deflate算法的原理和trouble points做了比较全面的解释，但是我第一次阅读这篇blog时对后半部分基本上没怎么看懂，原因是一方面我水平菜，另一方面我觉得是Antaeus Feldspar大神在这篇blog里省略了很多细节。在各种搜索了解这些缺失但是对理解算法很有必要的细节后，再读起来就比较顺畅了。这篇blog的内容就是扩充下[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)的内容，补齐其缺失的细节。
+前一篇[blog](http://kapsterio.github.io/test/2021/07/19/story-of-deflate.html)中，为了弄清楚长久一来一直困惑我的deflate、zip、gzip、zlib这些关系，我在互联网的各个角落里翻阅了不少RFC和web pages，我觉得算是基本弄清楚它们之间来龙去脉和联系了，接下来进入正题，写写关于Deflate算法。我对这个算法的兴趣源自于之前在公司内部做的一个优化imo客户端和服务端通讯协议相关的工作。本着向经典致敬的态度，我先是深入了解了下Deflate，在学习过程中，我先是找到了[RFC 1951](https://datatracker.ietf.org/doc/html/rfc1951)也就是Deflate压缩标准来啃，通读一篇发现还是对deflate的工作原理和细节还是模模糊糊，原因是RFC 1951里只有标准，不涉及解释，也就说只说了怎么做，没有解释为什么这么做。后来发现zlib的作者在[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)一文中对Deflate算法的原理和trouble points做了比较全面的解释，但是我第一次阅读这篇blog时对后半部分基本上没怎么看懂，原因是一方面我水平菜，另一方面我觉得是Antaeus Feldspar大神在这篇blog里省略了很多细节。在各种搜索了解这些缺失但是对理解算法很有必要的细节后，再读起来就比较顺畅了。这篇blog的内容就是扩充下[An Explanation of the Deflate Algorithm](https://zlib.net/feldspar.html)的内容，补齐其缺失的细节。
 
 <!--more-->
 
