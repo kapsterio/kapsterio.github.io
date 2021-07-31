@@ -99,7 +99,7 @@ HPACK将其称之为N-prefix coding。值得指出的是integer数据并不一�
 
 String literal相对简单，由三部分（也可能是四部分）组成：一个bit的标志位，string literal的长度和string literal的data。其中起始标志位用于标识string literal的data是否是huffman coding。
 
-注意到huffman coding是变长编码，当string literal data是huffman coding的化，不一定能在整数字节位处结束，因此可能需要padding，为了防止decode误将padding decode为数据，HPACK规定如果string literal采用huffman coding表示，在结尾需要加个EOS symbol的code，然后再padding到整数字节。
+注意到huffman coding是变长编码，当string literal data是huffman coding的化，不一定能在整数字节位处结束，因此可能需要padding到整数字节结束位。
 
 余下格式都比较简单，不多做介绍了。
 
