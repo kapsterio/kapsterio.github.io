@@ -6,9 +6,9 @@ category:
 tags: []
 ---
 
-# Overview
+## Overview
 
-## Http2ConnectionHandler
+### Http2ConnectionHandler
 
 在上一篇blog已经大体介绍了。
 > 设计上，他可以说主要是Inbound handler，继承自ByteToMessageDecoder，通过内部decoder来对http2协议进行decode，decoder内部再委托给使用者自己实现的Http2FrameListener对收到的http2消息进行业务处理。这里和netty中常见的decoder decode出协议封装成对象消息交给pipeline下游业务handler的做法不太一样。另外，他在实现上又实现了ChannelOutboundHandler接口，看上去主要是为了实现flush方法，并不是作为一个encoder handler。如果使用方想去向连接上响应http2的response还需要通过他的encoder()方法拿到一个Http2FrameWriter对象，通过Http2FrameWriter的各种writeXXX接口直接write对应的http2消息/帧，可以说非常原始了。
@@ -66,7 +66,7 @@ Http2Connection内部定义的Listener接口是为了能够接受connection上st
 
 
 
-## Http2FrameCodec
+### Http2FrameCodec
 在上一篇blog也已经大体介绍了。
 
 > 回到Http2FrameCodec本身，他作为http2 frame的codec，继承自Http2ConnectionHandler，负责对当前存活着的stream上frame进行decode和encode, 和下游handler之间通过Http2StreamFrame进行交互。
@@ -77,7 +77,7 @@ Http2Connection内部定义的Listener接口是为了能够接受connection上st
 
 
 
-## Http2MultiplexHandler
+### Http2MultiplexHandler
 在上一篇blog也已经大体介绍了。
 
 > 这个类主要是对http2 stream复用这个行为进行了封装，当连接上有新的stream创建时，为其创建一个新的Http2MultiplexHandlerStreamChannel，并注册到eventLoop中，并对应用代码的handler屏蔽或者转换一些原有连接上frame消息（主要是控制frame），使得应用handler面向新的Http2MultiplexHandlerStreamChannel编程，只需要关注子channel上的事件。使用上需要和Http2FrameCodec一起使用。
@@ -85,14 +85,14 @@ Http2Connection内部定义的Listener接口是为了能够接受connection上st
 ![interface](../draw.io/http2ConnectionHandler.svg)
 
 
-# connection setup
+## connection setup
 todo
 
 
 
-# Inbound数据处理
+## Inbound数据处理
 
-## Overview
+### Overview
 
 ```plantumlcode
 @startuml
@@ -125,7 +125,7 @@ FrameReadListener -> FrameReadListener : ...
 下面分http2协议帧类型，解读下`FrameReadListener`的实现。
 
 
-## onDataRead
+### onDataRead
 ```plantumlcode
 @startuml
 
@@ -203,7 +203,7 @@ DATA帧是需要收flow controll的，因此onDataRead里涉及到`DefaultHttp2L
 
 DATA帧也可能携带end of stream标示，此时会导致stream状态发生切换，FrameReadListener通过调用Http2LifecycleManager的closeStreamRemote做到状态切换，Http2LifecycleManager就是Http2ConnectionHandler本身。至于什么要在Http2ConnectionHandler实现Http2LifecycleManager, 后面再分析分析。
 
-## onHeadersRead
+### onHeadersRead
 
 
 ```plantumlcode
@@ -250,22 +250,22 @@ Http2Connection通过listener将stream的创建、关闭等等事件通知到Flo
 后面将重点分析下`StreamByteDistributor`的实现
 
 
-## onPushPromiseRead
+### onPushPromiseRead
 和onHeadersRead类似，通过connection.remote().reservePushStream去预留一个stream，但是不会activate这个stream
 
 
-## onPriorityRead
+### onPriorityRead
 逻辑很简单，只需要通知encoder的flowController，去updateDependencyTree，然后通知应用层listener
 
-## onRstStreamRead
+### onRstStreamRead
 逻辑也比较简单，先做些状态的校验，然后通知应用层listener，最后通过调用lifecycleManager.closeStream关闭stream
 
-## onSettingsRead
+### onSettingsRead
 协议规定收到SETTINGS帧后，一旦所有的配置值都处理完后，接收方必须立即回复SETTINGS ack，发送方收到ack后，就可以应用新的配置值了。在netty的实现中，除了遵守这个行为外，还想做到：settings的接收方需要在发送任何利用了新的settings参数的帧之前发送setting ack帧。因此先通过encoder.writeSettingsAck() 回复给发送方ack，然后通过encoder.remoteSettings()应用settings， remoteSettings里将settings设置应用到Http2FrameWriter.Configuration里。
 
 比如SETTINGS帧里设置了INITIAL_WINDOW_SIZE, encoder.remoteSettings()会调用flowController().initialWindowSize()，这会导致flow controller触发writePendingBytes。因此需要前置writeSettingsAck()， 详见[issue 6520](https://github.com/netty/netty/issues/6520)，[issue 6521](https://github.com/netty/netty/pull/6521)。
 
-## onSettingsAckRead
+### onSettingsAckRead
 SETTINGS发送方在收到接收方的SETTINGS ACK后需要应用settings参数，由于可能有多个SETTINGS的存在，因此在netty DefaultHttp2ConnectionEncoder的实现中有个outstandingLocalSettingsQueue，有序存放还没有ack的settings，当收到一个ack时，从队尾取出并通过调用applyLocalSettings应用设置。
 
 applyLocalSettings里将settings设置应用到Http2FrameReader.Configuration里（和remoteSettings对应）
@@ -279,25 +279,25 @@ http2协议里定义了如下几种SETTINGS:
 - SETTINGS_MAX_FRAME_SIZE： 用于告诉对端自己能够接收的最大帧大小，初始值是2^14 -1 (16384)
 - SETTINGS_MAX_HEADER_LIST_SIZE： 用于告诉对端自己能够接受的最大的header list字节数。
 
-## onPingRead
+### onPingRead
 处理很简单，通过encoder.writePing()去回复一个ping ack，当然也会通知应用层
 
-## onWindowUpdateRead
+### onWindowUpdateRead
 当收到一个window update时，表示对端调整了自己的接收窗口，这时需要通过encoder.flowController().incrementWindowSize()，通知encoder的flowController
 变更所维护的发送window size，里面会触发streamByteDistributor.updateStreamableBytes
 
 
-## onGoAwayRead
+### onGoAwayRead
 收到这个标示发送方准备shutdown了，这时接收方需要关闭那些比lastStreamId大的流，通知应用层做些操作
 
-# outbound 数据处理
+## outbound 数据处理
 
 为了提高性能，netty http2将outbound的数据处理分为两个部分，一部分是由netty http2自己/应用程序触发的通过Http2FrameWriter的writeXXX接口进行write http2 frame的写提交过程，这过程只是提交需要进行的write操作，并不会真正的触发write系统调用。另外一部分则由Http2ConnectionHandler自己通过override `channelReadComplete`和`flush`驱动真正的写flush操作过程，这一过程将产生真正的write系统调用，将数据写往socket中。其中override`channelReadComplete`是为了能在一次eventloop轮完整read完、并处理完read得到的数据后进行一次flush写操作（一次eventloop轮中可能会调用`channelRead`多次，执行完后才会去执行一次`channelReadComplete`）。override `flush`操作是为了触发encoder进行write pending data。
 
 关于channelReadComplete和channelRead的区别见[这篇回答](https://stackoverflow.com/questions/22354135/in-netty4-why-read-and-write-both-in-outboundhandler/22372777#22372777)
 
 
-## part 1
+### part 1
 
 ### writeHeader
 

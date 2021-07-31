@@ -6,16 +6,14 @@ category:
 tags: []
 ---
 
-# 怎么基于netty构建一个HTTP2 server
+## 怎么基于netty构建一个HTTP2 server
 
-## 配置h2 server
+### 配置h2 server
 
 h2 server是基于TLS的ALPN的扩展来start http2的，因此需要先为pipeline配置上ssl handler，然后监听ssl 握手完成事件，得到ALPN的protocol，再根据protocol来配置pipeline。
 
 
 netty里已经提供好一个`ApplicationProtocolNegotiationHandler`基类，通过实现其`configurePipeline`方法来根据ALPN扩展里的protocol来配置相应的pipeline
-
-<!--more-->
 
 ```
     @Override
@@ -35,11 +33,11 @@ netty里已经提供好一个`ApplicationProtocolNegotiationHandler`基类，通
         throw new IllegalStateException("unknown protocol: " + protocol);
     }
 ```
-
+<!--more-->
 
 HelloWorldHttp2HandlerBuilder().build()部分就是创建http2相关的handler， 后面还会详细介绍。
 
-## 配置h2c server (client没有server的是否是http2的先验知识)
+### 配置h2c server (client没有server的是否是http2的先验知识)
 
 h2c server跑在原始的tcp connnection上，需要先通过http1的协议upgrade机制来升级协议，因此pipeline里首先需要add的是http1相关的handler，主要有两个
 - HttpServerCodec

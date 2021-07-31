@@ -7,9 +7,9 @@ tags: []
 ---
 
 
-# 怎么基于netty创建一个HTTP2 client
+## 怎么基于netty创建一个HTTP2 client
 
-## 配置h2的client pipeline
+### 配置h2的client pipeline
 ```
     private void configureSsl(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
@@ -37,7 +37,7 @@ tags: []
 
 <!--more-->
 
-## 配置h2c client pipeline
+### 配置h2c client pipeline
 
 ```
     private void configureClearText(SocketChannel ch) {
