@@ -77,8 +77,9 @@ OK，既然限制了dynamic table的大小，当向table中加入header field使
 
 #### Static Huffman coding
 
-最后一个问题，对于哪些不能用INDEX表示的数据，HPACK允许采用static huffman编码来进行压缩（当然，也允许压根就压缩）。所谓static huffman编码，其实就是HPACK固定好了一个适用于http header的huffman码表，encoder/decoder直接查表编解码就行了。
+最后一个问题，对于哪些不能用INDEX表示的数据，HPACK允许采用static huffman编码来进行压缩（当然，也允许压根就不压缩）。所谓static huffman编码，其实就是HPACK固定好了一个适用于http header的huffman码表，encoder/decoder直接查表编解码就行了。
 
+关于huffman encoder/decoder的实现这里再多说一点，从算法原理上来看很简单，就是查表，encoder查从byte到code的表，decoder查从code到byte的表。但是从实现上来看，考虑到code是变长的bits，压缩数据由这些变长bits构成由于是前缀编码，每个code中间也没有啥分割标识，而且decoder代码通常是按每个字节来处理压缩数据的，问题就来：怎么去高效地按每个字节decode huffman encoded数据。后面我们将以netty中HpackHuffmanDecoder/Encoder为例，分析下huffman coding的实现。
 
 
 ### HPACK data format
