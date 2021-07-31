@@ -12,10 +12,11 @@ tags: []
 
 ### 为什么需要Header compression
 
-Patrick McManus曾在[In Defense of Header Compresson](https://lists.w3.org/Archives/Public/ietf-http-wg/2012JulSep/1096.html)邮件中给出了header压缩与否对延迟的影响的一些数据。
+Patrick McManus曾在[In Defense of Header Compresson](https://lists.w3.org/Archives/Public/ietf-http-wg/2012JulSep/1096.html)邮件中给出了header压缩与否对延迟的影响的一些数据，很直观地说明了header压缩的必要性。
 
 在如今的互联网上， 一个页面里通常会包含很多资源，每个资源都会需要http请求去加载，如果每个请求的header大小是1400字节（Cookies, Referer之类的header通常都很大，所以1400字节大小规模并不鲜见），光是要去传输这些headers，可能都需要花费7-8个rtt，造成这一现象的原因是TCP拥塞控制算法的slow start过程。此时如果能对header进行压缩，会很大程度上降低http请求的延迟。
 
+<!--more-->
 
 ### 为什么是HPACK
 我们知道压缩算法并不是一个新鲜玩意，http对header的压缩为什么不使用已有的类似deflate这种通用压缩算法呢。事实上在http在历史上确实这么干过，比如在很早之前，https中的tls协议承载的应用层数据就是deflate压缩后的header和body数据，http2的前身SPDY协议也采用一个带preset dictionary的类似deflate对header进行压缩，但是这种做法存在严重的安全漏洞，也就是臭名昭著的[CRIME](https://zh.wikipedia.org/zh-hans/CRIME)攻击。攻击者只要能够做到控制请求里的部分header，就能在多项式时间内通过观测最终请求数据包的大小来恢复出用户浏览器里附带的一些私密header（比如cookie），CRIME之所以能够实施，是因为deflate压缩策略采用的LZ77这种前向字符串匹配压缩算法，攻击者构造header来尝试与已有的header进行字符匹配，如果匹配成功，最终的数据包大小将会减少，匹配的越多，大小减少的也越多。这点信息量的信息泄漏就能足以被攻击者所利用，继而逐步恢复出整个header的value。
@@ -121,6 +122,10 @@ String literal相对简单，由三部分（也可能是四部分）组成：一
 #### SIZE UPDATE Representation
 ![hpack size update](/public/fig/hpack_size_update.png)
 
+
+### 总结
+
+可以看出[RFC 7541](https://datatracker.ietf.org/doc/html/rfc7541#section-7.2)只规定了HPACK压缩数据的格式，以及static table、static huffman coding等内容，有了这些decoder的实现就非常明确了，但是HPACK并没有规定协议实现者怎么实现encoder，只提供了一些安全上的建议，这就给了实现者一些encoder上的自由，比如什么header不能放入table，table的容量控制策略等等，一个好的实现需要考虑这些因素。
 
 
 
