@@ -7,7 +7,7 @@ tags: []
 ---
 ## Static Huffman Codec
 
-前一篇blog [HPACK explained in detail](http://kapsterio.github.io/test/2021/07/29/hpack-explained.html)里，我试着分析了下HPACK的设计细节。其中HPACK对于string literal数据采用static Huffman coding来编码，这一篇blog将继续拓展这个话题，写写关于HPACK中static huffman decode/encode算法实现的内容，虽然HPACK里用的static huffman coding不涉及根据数据构造huffman树，但是想要实现一个高效的HPACK huffman encoder/decoder并不是一个non-trival的事情，尤其是将huffman 高效decoder的实现。接下来的内容分为两个部分，分别以netty HPACK的实现为例，介绍下目前工业界常见huffman decoder/encoder的算法。
+前一篇blog [HPACK explained in detail](http://kapsterio.github.io/test/2021/07/29/hpack-explained.html)里，我试着分析了下HPACK的设计细节。其中HPACK对于string literal数据采用static Huffman coding来编码，这一篇blog将继续拓展这个话题，写写关于HPACK中static huffman decode/encode算法实现的内容，虽然HPACK里用的static huffman coding不涉及根据数据构造huffman树，但是想要实现一个高效的HPACK huffman encoder/decoder并不是一个很直观的事情，尤其是将huffman 高效decoder的实现。接下来的内容分为两个部分，分别以netty HPACK的实现为例，介绍下目前工业界常见huffman decoder/encoder的算法。
 
 
 <!--more-->
