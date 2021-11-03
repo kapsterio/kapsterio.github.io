@@ -6,17 +6,17 @@ category:
 tags: []
 ---
 
+## Overview
+
 这篇blog是关于tls1.2协议handshake部分的介绍和分析，TLS握手协议作用主要有以下几点：
 - 协商出双方协议的版本、加密算法套件
 - 认证对方身份
 - 协商出一个用于后续加密数据的密钥
 
 
-## Handshake Overview
-
 一个完整的TLS握手过程如下图所示：
 
-[!tls handshake](/public/fig/full_handshake.png)
+![tls handshake](/public/fig/full_handshake.png)
 
 
 <!--more-->
