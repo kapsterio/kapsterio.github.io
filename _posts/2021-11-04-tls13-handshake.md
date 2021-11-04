@@ -15,6 +15,9 @@ tls1.3将握手概括为三个阶段
 - Server Parameters阶段： 该阶段Server通过EncryptedExtensions消息将server端一些非密码学参数扩展告诉client。此外还包括一个可选的CertificateRequest消息。和tls1.2一样，如果server端选择认证client，就需要此时发送这个消息给client。
 - Authentication阶段：该阶段包括client和sever双方相互认证的所有消息，首先server端会发送Certificate消息将自己的证书传给client，并随即发送一个CertificateVerify消息来证明自己持有该证书，然后server完成握手发送一个Finished消息。client端这边如果被要求提供证书来认证身份的话首先也需要通过Certificate、CertificateVerify来发送证书、证明持有证书，最后client发送Finished消息完成握手。
 
+
+<!--more-->
+
 ![tls1.3 handshake](/public/fig/tls1_3_handshake.png)
 
 可以看出tls1.3在第一个rtt就开始进行密钥交换以及server端的身份认证了，一个rtt后就可以开始application data的传输了，之所以能做到这点，是因为tls1.3只保留(EC)DHE方式的密钥交换，其不依赖于server端证书。
