@@ -248,6 +248,7 @@ plaintext of encrypted_record =
 - HKDF-Extract：用输入的原始密钥和salt生成一个伪随机密钥
 - HKDF-Expand：将HKDF-Extract输出的伪随机密钥扩展成任意长度，
 定义分别如下：
+
 ```
 HKDF_Extract(salt, IKM) -> PRK
 //salt： 可选的“盐”，如果不提供，则默认为0串
