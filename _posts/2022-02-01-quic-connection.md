@@ -15,7 +15,7 @@ QUIC协议的RFC大概是目前为止我个人读过的最复杂的RFC文档，�
 - [RFC 9001]([https://www.rfc-editor.org/rfc/rfc9001.html](https://www.rfc-editor.org/rfc/rfc9001.html)) 是QUIC整合TLS1.3进行密码学握手建立安全的QUIC连接部分
 - [RFC 9002]([https://www.rfc-editor.org/rfc/rfc9002.html](https://www.rfc-editor.org/rfc/rfc9002.html)) 则是关于QUIC丢包检测拥塞控制部分
 
-RFC 9001在之前的[blog]([http://kapsterio.github.io/test/2021/12/28/quic-handshake.html](http://kapsterio.github.io/test/2021/12/28/quic-handshake.html))中已经做了解读，这篇是继QUIC handshake之后QUIC连接相关的协议解读，主要内容来自于RFC 9000中的第5-第10章节，并按照连接建立、连接迁移、连接终止顺序做了一些内容上的重新组织。另外RFC9000包含的信息量非常大，对很多QUIC设计和行为规定也没有做必要解释，这也造成了阅读体验上枯燥和难懂，因此这篇blog 里尽量对一些我个人认为比较难以理解的点做些motivation上的补充说明。
+RFC 9001在之前的[blog]([http://kapsterio.github.io/test/2021/12/28/quic-handshake.html](http://kapsterio.github.io/test/2021/12/28/quic-handshake.html))中已经做了解读，这篇是继QUIC handshake之后QUIC连接相关的协议解读，主要内容来自于RFC 9000中的第5-第10章节，并按照连接建立、连接迁移、连接终止顺序做了一些内容上的重新组织。另外RFC9000包含的信息量非常大，对很多QUIC设计和行为规定也没有做必要解释，这也造成了阅读体验上枯燥和难懂，因此这篇blog 里尽量对一些我个人认为比较难以理解的点做些motivation上的补充说明。看完并理解这部分内容的话，读者就可以理解QUIC的整个连接建立过程和连接终止过程的工作细节。
 
 PS: QUIC Connection中有很多地方设计上参考了DTLS，了解下DTLS是怎么做的个人觉得有助于理解QUIC，这部分具体可以参考[DTL1.2](http://kapsterio.github.io/test/2022/01/01/dtls12.html)和[DTLS1.3](http://kapsterio.github.io/test/2022/01/09/dtls13.html)。
 
@@ -175,9 +175,9 @@ Version Negotiation包目前没有加密保护，后续的版本可能会将其�
 
 **what:** 这里的Path指的就是传统UDP的四元组，一个Connection可能存在多个Path，
 
-**when: **Path validation一般发生在一端感知到对端发生连接迁移后，用于确保对端新的地址是真实有效的。也能发生于连接的任何时候，比如当对端已经休眠一端时间后，本端想知道对端地址是否还有效。再比如本端想发送主动的连接迁移前，可能会先进行一次path 探测。
+**when:** Path validation一般发生在一端感知到对端发生连接迁移后，用于确保对端新的地址是真实有效的。也能发生于连接的任何时候，比如当对端已经休眠一端时间后，本端想知道对端地址是否还有效。再比如本端想发送主动的连接迁移前，可能会先进行一次path 探测。
 
-**how: **
+**how:**
 
 - 一端通过PATH_CHALLENGE frame来发起path validation，另一端需要以PATH_RESPONSE帧echo 收到的challenge。成功验证PATH_RESPONSE 后才算成功path validation，收到PATH_CHALLENGE的ACK不算完成path validation，因为ACK帧信息墒太小，即便是加密的也可能被暴力伪造。
 - PATH_CHALLENGE和PATH_RESPONSE都需要填充到至少1200个字节，用来确保MTU是足够的，除非当前连接被anti-amplification limit限制了。如果被anti-amplification limit限制了，在完成当前的path validation后还需要再进行一次path validation用来验证Path MTU。
