@@ -142,9 +142,7 @@ RACK部分最核心的问题是怎么通过最近的收到的ACK判断已经发�
 
 RACK优于传统快重传的地方就在于收到ACK feeback后是通过时间阈值来判定loss，而非duplicate  counting，从而能够在一些乱序程度高的链路中依旧有效（不会导致虚假重传）。
 
-那么这个时间阈值怎么确定呢？为了能够容忍乱序，RFC8985中也给出了一个动态调整reordering window
-
-值的算法，调整的思想是
+那么这个时间阈值怎么确定呢？为了能够容忍乱序，RFC8985中也给出了一个动态调整reordering window值的算法，调整的思想是:
 
 - reordering window从一个small fraction of RTT的初始值开始，如果链路上没有观察到过reorder，那么从0开始
 - 如果收到了对端的DSACK（说明有虚假重传），表示reordering window设置的小了，需要调大window值
@@ -240,9 +238,9 @@ QUIC的丢包检测非常类似于RACK-TLP，一样都是基于ACK 来检测是�
 max(kTimeThreshold * max(smoothed_rtt, latest_rtt), kGranularity)
 // 其中kTimeThreshold推荐为9/8，效果就是比当前smoothed_rtt大一点。
 
-```
+``` 
 
-    实现上time threshold通常依赖一个timer，发送端在收到一个ack后（假设其ack了当前packet之后发送的packet），如果当前packet还没有被认为丢失，那么会设置一个丢包检测的timer，timer在当前packet sent time + time threshold 时到期，到期时将触发重传。
+实现上time threshold通常依赖一个timer，发送端在收到一个ack后（假设其ack了当前packet之后发送的packet），如果当前packet还没有被认为丢失，那么会设置一个丢包检测的timer，timer在当前packet sent time + time threshold 时到期，到期时将触发重传。
 
 
 
