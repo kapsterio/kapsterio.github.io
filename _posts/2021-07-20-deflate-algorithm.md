@@ -99,7 +99,7 @@ Deflate通过这样的方式在码表长度和算法的计算复杂度之间做�
 #### 对literal/length 的huffman coding
 literal就是原始数据中的一个个字符（字节），所以一个literal的取值范围是0-255（256种不同的取值）。length前面说了，取值范围是3-258（也是256个不同的取值）。Deflate在这里比较trick地将literal值、length值、以及数据块结束标识全部统一到一个alphabet中进行编码，得到也是同一个码表。这样做的好处是不需要在最终的编码中用一个标识位来标识当前编码的类型（是literal还是length或者是块结束标识）。当然也有代价，代价就是huffman树变大了。Deflate对literal取值分布没有做任何假设，但对length的取值做了和distance类似的假设，即length越大意味这字符串匹配的长度越长，出现的概率越小，因此Deflate对length的value space做了类似distance的分段处理，将256种取值划分为29个区间段。如下表所示：
 
-![length coding](/public/fig/distance_coding.png)
+![length coding](/public/fig/length_coding.png)
 
 细心的读者会发现，285这个length的bits是0，意味着285作为一个独立的段参与huffman coding中，为什么？我猜测是由于285作为Deflate规定的最大匹配串长度，也就说所有超过285的匹配字符串长度都被截断到285了，因此其出现的概率会相对高些。
 
@@ -135,4 +135,4 @@ End of the story.
 - 为了最小化huffman码表的数据量，用code lengths唯一表示一颗huffman树
 
 
-最后不得不感慨下Deflate这个三十多年前诞生、比我年龄都大的压缩算法至今仍然在互联网里扮演着不可或缺的角色，深入算法细节后又发现其实并没有应用什么数学魔法在里面，相对于图像、视频领域广泛应用的DCT变换、小波变换之类的压缩算法，Deflate和他们比起来有点类似于物理攻击和法术攻击的区别，Deflate之所以有着这么顽强的生命力，我觉得很大一部分归功于作者对数据和haffan coding深入分析和实践后得到的trick和经验，这种死扣细节、优化到极致的做法值得学习。
+最后不得不感慨下Deflate这个三十多年前诞生、比我年龄都大的压缩算法至今仍然在互联网里扮演着不可或缺的角色，深入算法细节后又发现其实并没有应用什么数学魔法在里面，相对于图像、视频领域广泛应用的DCT变换、小波变换之类的压缩算法，Deflate和他们比起来有点类似于物理攻击和法术攻击的区别，Deflate之所以有着这么顽强的生命力，我觉得很大一部分归功于作者对数据和haffman coding深入分析和实践后得到的trick和经验，这种死扣细节、优化到极致的做法值得学习。
